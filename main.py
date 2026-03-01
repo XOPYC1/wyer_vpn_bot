@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
 
-# ТОКЕН ТВОЕГО БОТА (обновлен)
+# ТОКЕН ТВОЕГО БОТА
 BOT_TOKEN = "8440825170:AAGt9sCLhMhUnnUmkiieDCK8ApKTaKf6cPE"
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -13,7 +13,10 @@ WEB_APP_URL = "https://wyer-vpn-bot.vercel.app"
 def send_welcome(message):
     # Создаем кнопку меню
     web_app = types.WebAppInfo(url=WEB_APP_URL)
-    menu_button = types.MenuButtonWebApp(text="Открыть", web_app=web_app)
+    
+    # --- ИСПРАВЛЕНО: добавлено type='web_app' ---
+    menu_button = types.MenuButtonWebApp(type='web_app', text="Открыть", web_app=web_app)
+    # ---------------------------------------------
     
     # Устанавливаем кнопку
     bot.set_chat_menu_button(message.chat.id, menu_button)
