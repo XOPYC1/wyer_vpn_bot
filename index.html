@@ -52,16 +52,24 @@
         tg.expand(); // Раскрыть на весь экран
         
         // Получение данных пользователя
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('user-name').innerText = "Привет, " + user.first_name;
-        } else {
+        try {
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                document.getElementById('user-name').innerText = "Привет, " + user.first_name;
+            } else {
+                document.getElementById('user-name').innerText = "Привет, Пользователь";
+            }
+        } catch (e) {
             document.getElementById('user-name').innerText = "Привет, Гость";
         }
 
-        // Функция открытия VPN приложения
+        // Функция открытия VPN приложения через API Telegram
         function openVpn(url) {
-            tg.openLink(url);
+            if (window.Telegram.WebApp.openLink) {
+                window.Telegram.WebApp.openLink(url);
+            } else {
+                window.location.href = url;
+            }
         }
     </script>
 </body>
