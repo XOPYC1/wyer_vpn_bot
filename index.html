@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Применяем цвета из темы Telegram */
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
         .card { background-color: var(--tg-theme-secondary-bg-color); }
         .btn-primary { background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
@@ -28,7 +27,7 @@
                     <h2 class="font-bold text-lg">Швеция</h2>
                 </div>
             </div>
-            <button onclick="openVpn('v2raytun://install-config?url=http://77.91.84.106:2096/sub/ego95km8cmaejnni')" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold shadow-md">
+            <button onclick="openVpn('http://77.91.84.106:2096/sub/ego95km8cmaejnni')" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold shadow-md">
                 Подключить
             </button>
         </div>
@@ -40,18 +39,16 @@
                     <h2 class="font-bold text-lg">США</h2>
                 </div>
             </div>
-            <button onclick="openVpn('v2raytun://install-config?url=http://77.91.84.106:2096/sub/ego95km8cmaejnni')" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold shadow-md">
+            <button onclick="openVpn('http://77.91.84.106:2096/sub/ego95km8cmaejnni')" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold shadow-md">
                 Подключить
             </button>
         </div>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрыть на весь экран
+        tg.expand();
         
-        // Получение данных пользователя
         try {
             const user = tg.initDataUnsafe?.user;
             if (user) {
@@ -63,13 +60,9 @@
             document.getElementById('user-name').innerText = "Привет, Гость";
         }
 
-        // Функция открытия VPN приложения через API Telegram
         function openVpn(url) {
-            if (window.Telegram.WebApp.openLink) {
-                window.Telegram.WebApp.openLink(url);
-            } else {
-                window.location.href = url;
-            }
+            // Telegram должен сам открыть v2raytun, если ссылка ведет на файл настроек
+            tg.openLink(url);
         }
     </script>
 </body>
