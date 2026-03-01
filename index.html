@@ -13,36 +13,34 @@
     </style>
 </head>
 <body class="p-4 font-sans">
-    <div id="user-card" class="card rounded-xl p-4 shadow-lg mb-4 text-center">
-        <img id="user-photo" class="w-20 h-20 rounded-full mx-auto mb-2 border-2 border-blue-500" src="https://via.placeholder.com/80">
-        <h1 id="user-name" class="text-xl font-bold">Загрузка...</h1>
-        <p id="user-id" class="text-sm opacity-70">ID: ---</p>
+    <div class="card rounded-xl p-4 shadow-lg mb-4 text-center">
+        <img id="user-photo" class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-blue-500" src="https://via.placeholder.com/80">
+        <h1 id="user-name" class="text-lg font-bold">Загрузка...</h1>
     </div>
 
     <div class="space-y-3">
-        <div class="card p-4 rounded-lg flex justify-between items-center">
-            <span>🇸🇪 Швеция — Быстрый ⚡️</span>
-            <button class="btn-primary px-4 py-1 rounded-md text-sm">Подключить</button>
+        <div class="card p-3 rounded-lg flex justify-between items-center">
+            <div>
+                <span class="text-xl">🇸🇪</span> Швеция — Быстрый ⚡️
+            </div>
+            <a href="vless://..." class="btn-primary px-4 py-2 rounded-md text-sm font-bold">ПОДКЛЮЧИТЬ</a>
         </div>
-        <div class="card p-4 rounded-lg flex justify-between items-center">
-            <span>🇺🇸 США — YouTube 🎬</span>
-            <button class="btn-primary px-4 py-1 rounded-md text-sm">Подключить</button>
+        
+        <div class="card p-3 rounded-lg flex justify-between items-center">
+            <div>
+                <span class="text-xl">🇺🇸</span> США — YouTube 🎬
+            </div>
+            <a href="vless://..." class="btn-primary px-4 py-2 rounded-md text-sm font-bold">ПОДКЛЮЧИТЬ</a>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
-
-        // Получаем данные пользователя из Telegram
+        tg.expand(); 
         const user = tg.initDataUnsafe?.user;
-
         if (user) {
-            document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-            document.getElementById('user-id').innerText = 'ID: ' + user.id;
-            if (user.photo_url) {
-                document.getElementById('user-photo').src = user.photo_url;
-            }
+            document.getElementById('user-name').innerText = user.first_name;
+            if (user.photo_url) document.getElementById('user-photo').src = user.photo_url;
         }
     </script>
 </body>
