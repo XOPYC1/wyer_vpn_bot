@@ -7,6 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Применяем цвета из темы Telegram */
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
         .card { background-color: var(--tg-theme-secondary-bg-color); }
         .btn-primary { background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
@@ -25,11 +26,10 @@
                 <span class="text-3xl">🇸🇪</span>
                 <div>
                     <h2 class="font-bold text-lg">Швеция</h2>
+                    <p class="text-xs opacity-70">Быстрый</p>
                 </div>
             </div>
-            <button onclick="openVpn('http://77.91.84.106:2096/sub/ego95km8cmaejnni')" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold shadow-md">
-                Подключить
-            </button>
+            <span class="text-xs opacity-50">Выбрано</span>
         </div>
         
         <div class="card p-4 rounded-xl flex justify-between items-center shadow-sm">
@@ -37,18 +37,19 @@
                 <span class="text-3xl">🇺🇸</span>
                 <div>
                     <h2 class="font-bold text-lg">США</h2>
+                    <p class="text-xs opacity-70">YouTube</p>
                 </div>
             </div>
-            <button onclick="openVpn('http://77.91.84.106:2096/sub/ego95km8cmaejnni')" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold shadow-md">
-                Подключить
-            </button>
+            <span class="text-xs opacity-50">Выбрано</span>
         </div>
     </div>
 
     <script>
+        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); // Раскрыть на весь экран
         
+        // Получение данных пользователя
         try {
             const user = tg.initDataUnsafe?.user;
             if (user) {
@@ -60,10 +61,20 @@
             document.getElementById('user-name').innerText = "Привет, Гость";
         }
 
-        function openVpn(url) {
-            // Telegram должен сам открыть v2raytun, если ссылка ведет на файл настроек
-            tg.openLink(url);
-        }
+        // --- Настройка синей кнопки внизу ---
+        tg.MainButton.text = "Открыть VPN и подключить"; // Текст на кнопке
+        tg.MainButton.color = "#2481cc"; // Синий цвет
+        tg.MainButton.textColor = "#ffffff"; // Белый текст
+        tg.MainButton.show(); // Показать кнопку
+
+        // --- Действие при нажатии на нижнюю кнопку ---
+        tg.MainButton.onClick(function() {
+            // Ссылка подписки, которую ты прислал
+            const vpnUrl = 'v2raytun://install-config?url=http://77.91.84.106:2096/sub/ego95km8cmaejnni';
+            
+            // Открываем приложение
+            tg.openLink(vpnUrl);
+        });
     </script>
 </body>
 </html>
