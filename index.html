@@ -3,107 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyer VPN - Панель управления</title>
+    <title>Wyer VPN - Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <style>
-        /* Стилизация под тему Telegram */
         body { 
             background-color: var(--tg-theme-bg-color); 
             color: var(--tg-theme-text-color); 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
         .card { 
             background-color: var(--tg-theme-secondary-bg-color); 
-            border-radius: 20px; 
+            border-radius: 24px; 
             border: 1px solid rgba(0,0,0,0.05); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
         .button-theme { 
             background-color: var(--tg-theme-button-color); 
             color: var(--tg-theme-button-text-color); 
             border-radius: 999px; 
-            transition: all 0.2s ease;
+            transition: transform 0.1s ease, opacity 0.2s ease;
         }
-        .stat-item { 
-            background-color: var(--tg-theme-bg-color); 
+        .button-theme:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
         .tab-active { 
-            border-bottom: 2px solid var(--tg-theme-button-color); 
+            border-bottom: 3px solid var(--tg-theme-button-color); 
             color: var(--tg-theme-button-color); 
             font-weight: bold; 
         }
+        .stat-item { 
+            background-color: var(--tg-theme-bg-color); 
+            border-radius: 16px;
+        }
+        #qrcode img { 
+            margin: 0 auto; 
+            display: block; 
+            border: 10px solid white;
+            border-radius: 12px;
+        }
+        input, select, textarea {
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            border: 1px solid rgba(0,0,0,0.1);
+            outline: none;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
     </style>
 </head>
-<body class="p-4 text-sm pt-10">
+<body class="p-4 pt-10">
 
-    <div class="text-center mb-6">
+    <div class="text-center mb-8">
         <h1 class="text-4xl font-extrabold text-blue-500 tracking-tighter">Wyer VPN</h1>
+        <p class="text-xs opacity-50 mt-1 uppercase tracking-widest">Premium Proxy Service</p>
     </div>
 
-    <div class="flex justify-around mb-6 border-b border-gray-200">
-        <button onclick="showTab('profile')" class="tab-button tab-active p-3 flex-1 text-center" id="btn-profile">👤 Профиль</button>
-        <button onclick="showTab('promo')" class="tab-button p-3 flex-1 text-center" id="btn-promo">🎁 Промо</button>
-        <button onclick="showTab('admin')" class="tab-button p-3 flex-1 text-center hidden" id="btn-admin">🛠️ Админ</button>
+    <div class="flex justify-around mb-8 border-b border-gray-200 text-[10px] uppercase font-bold tracking-wider">
+        <button onclick="showTab('profile')" class="tab-button tab-active pb-3 flex-1" id="btn-profile">Профиль</button>
+        <button onclick="showTab('subscription')" class="tab-button pb-3 flex-1" id="btn-subscription">Подписка</button>
+        <button onclick="showTab('buy')" class="tab-button pb-3 flex-1" id="btn-buy">Купить</button>
+        <button onclick="showTab('support')" class="tab-button pb-3 flex-1" id="btn-support">Help</button>
+        <button onclick="showTab('admin')" class="tab-button pb-3 flex-1 hidden text-red-500" id="btn-admin">Админ</button>
     </div>
 
     <div id="profile" class="tab-content space-y-4">
-        <div class="card p-6 space-y-4">
-            <p class="text-2xl font-bold" id="user-name">Загрузка...</p>
-            
-            <div class="flex justify-between items-center p-4 rounded-xl stat-item">
-                <span class="font-medium opacity-80">Баланс:</span>
-                <span class="font-bold text-xl text-green-600" id="user-balance">0$</span>
+        <div class="card p-6 space-y-6">
+            <div class="flex items-center gap-4">
+                <div id="avatar-placeholder" class="rounded-full w-16 h-16 border-4 border-blue-500/20 flex items-center justify-center text-2xl bg-blue-500/10 font-bold">👤</div>
+                <div>
+                    <p class="text-2xl font-bold tracking-tight" id="user-name">Username</p>
+                    <p class="text-xs opacity-50">ID: <span id="user-id">0000000000</span></p>
+                </div>
             </div>
 
-            <div class="flex gap-2">
-                <input type="number" id="topup-amount" placeholder="Сумма ($)" class="flex-grow p-4 rounded-full border bg-white/5">
-                <button onclick="topUp()" class="p-4 px-6 font-bold button-theme">➕ Пополнить</button>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center p-4 stat-item">
+                    <span class="font-medium opacity-70">Ваш баланс:</span>
+                    <span class="font-bold text-2xl text-green-500" id="user-balance">0.00$</span>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="text-[10px] uppercase ml-2 opacity-50">Пополнить баланс (USDT)</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="topup-amount" placeholder="10.0" class="flex-grow p-4 rounded-2xl text-lg font-bold">
+                        <button onclick="topUp()" class="button-theme px-6 font-bold">➕</button>
+                    </div>
+                </div>
+
+                <button onclick="showTab('promo-entry')" class="w-full p-4 rounded-2xl bg-blue-500/5 text-blue-500 font-bold text-sm">
+                    🎁 У меня есть промокод
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="promo" class="tab-content hidden">
+    <div id="promo-entry" class="tab-content hidden space-y-4">
         <div class="card p-6 space-y-4">
-            <h2 class="text-lg font-bold text-center">🎁 Введите промокод</h2>
-            <input type="text" id="promo-code" placeholder="PROMO2026" class="w-full p-4 rounded-full border text-center bg-white/5 uppercase">
-            <button onclick="activatePromo()" class="w-full p-4 font-bold button-theme">Активировать</button>
+            <h2 class="text-xl font-bold text-center">Активация промокода</h2>
+            <input type="text" id="promo-code" placeholder="ENTER_CODE_HERE" class="w-full p-5 rounded-2xl border text-center font-mono text-xl uppercase tracking-widest">
+            <button onclick="activatePromo()" class="button-theme w-full p-5 font-bold shadow-lg">Активировать бонус</button>
+            <button onclick="showTab('profile')" class="w-full text-center opacity-50 text-xs">Назад в профиль</button>
         </div>
     </div>
 
-    <div id="admin" class="tab-content hidden">
-        <div class="card p-6 space-y-4">
-            <h2 class="text-xl font-bold text-center text-red-500">🛠️ Админ панель</h2>
+    <div id="subscription" class="tab-content hidden space-y-4">
+        <div class="card p-6 space-y-6">
+            <div class="text-center p-4 rounded-2xl stat-item border border-blue-500/20">
+                <p class="text-xs opacity-60 uppercase mb-1">Статус подписки</p>
+                <p id="sub-date" class="text-xl font-bold text-blue-500">Нет активной подписки</p>
+            </div>
+            
+            <div id="qr-container" class="flex justify-center items-center bg-white p-6 rounded-3xl hidden">
+                <div id="qrcode"></div>
+            </div>
             
             <div class="space-y-2">
-                <input type="number" id="target-id" placeholder="ID пользователя" class="w-full p-4 rounded-full border bg-white/5">
-                <input type="number" id="give-amount" placeholder="Сумма ($)" class="w-full p-4 rounded-full border bg-white/5">
-                <button onclick="adminGive()" class="w-full p-4 font-bold bg-red-500 text-white rounded-full">💰 Выдать баланс</button>
+                <label class="text-[10px] uppercase ml-2 opacity-50">Ключ доступа (VLESS):</label>
+                <textarea id="vless-link" class="w-full p-4 text-[10px] h-24 rounded-2xl font-mono" readonly placeholder="Здесь появится ваш ключ после покупки..."></textarea>
+                <button onclick="copyKey()" class="w-full p-3 text-xs font-bold bg-blue-500/10 text-blue-500 rounded-xl">Копировать ключ</button>
+            </div>
+            
+            <button onclick="deleteSubscription()" class="w-full p-4 font-bold text-xs text-red-500 opacity-50">
+                Удалить текущую конфигурацию
+            </button>
+        </div>
+    </div>
+
+    <div id="buy" class="tab-content hidden space-y-4">
+        <div class="card p-6 space-y-6">
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold">Выберите тарифный план</h2>
+                
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="setTariff('7', '0.5$')" class="tariff-btn p-5 rounded-2xl border-2 border-transparent bg-black/5 text-left flex justify-between items-center" id="t-7">
+                        <div>
+                            <p class="font-bold">Пробный период</p>
+                            <p class="text-xs opacity-50">7 дней доступа</p>
+                        </div>
+                        <span class="font-bold text-blue-500">0.5$</span>
+                    </button>
+                    <button onclick="setTariff('30', '1.5$')" class="tariff-btn p-5 rounded-2xl border-2 border-transparent bg-black/5 text-left flex justify-between items-center" id="t-30">
+                        <div>
+                            <p class="font-bold">Стандарт</p>
+                            <p class="text-xs opacity-50">30 дней доступа</p>
+                        </div>
+                        <span class="font-bold text-blue-500">1.5$</span>
+                    </button>
+                    <button onclick="setTariff('90', '4.0$')" class="tariff-btn p-5 rounded-2xl border-2 border-transparent bg-black/5 text-left flex justify-between items-center" id="t-90">
+                        <div>
+                            <p class="font-bold">Квартал</p>
+                            <p class="text-xs opacity-50">90 дней доступа</p>
+                        </div>
+                        <span class="font-bold text-blue-500">4.0$</span>
+                    </button>
+                </div>
             </div>
 
-            <hr class="border-gray-200">
+            <button onclick="confirmPurchase()" class="button-theme w-full p-6 font-extrabold text-lg shadow-xl mt-4">
+                💎 Купить сейчас
+            </button>
+        </div>
+    </div>
 
-            <div class="space-y-2">
-                <input type="text" id="admin-promo-code" placeholder="Код промокода" class="w-full p-4 rounded-full border bg-white/5">
-                <input type="number" id="admin-promo-amount" placeholder="Сумма ($)" class="w-full p-4 rounded-full border bg-white/5">
-                <button onclick="adminPromo()" class="w-full p-4 font-bold bg-green-500 text-white rounded-full">➕ Создать промо</button>
+    <div id="support" class="tab-content hidden">
+        <div class="card p-8 text-center space-y-6">
+            <div class="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto text-4xl">💬</div>
+            <h2 class="text-2xl font-bold">Нужна помощь?</h2>
+            <p class="opacity-60 text-sm">Если у вас возникли проблемы с подключением или оплатой, наша поддержка работает 24/7.</p>
+            <a href="https://t.me/WyerVPNsupportBot" class="button-theme inline-block w-full p-4 font-bold text-base shadow-md">
+                Связаться с оператором
+            </a>
+        </div>
+    </div>
+
+    <div id="admin" class="tab-content hidden space-y-4">
+        <div class="card p-6 space-y-6 border-red-500/20">
+            <h2 class="text-2xl font-black text-red-500 uppercase tracking-tighter">Панель Управления</h2>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-4 rounded-2xl stat-item border border-black/5">
+                    <p class="text-[10px] uppercase opacity-50">Юзеров</p>
+                    <p class="text-xl font-bold" id="stat-users">...</p>
+                </div>
+                <div class="p-4 rounded-2xl stat-item border border-black/5">
+                    <p class="text-[10px] uppercase opacity-50">В обороте</p>
+                    <p class="text-xl font-bold" id="stat-balance">... $</p>
+                </div>
+            </div>
+            <button onclick="getStats()" class="w-full p-3 rounded-xl bg-blue-500 text-white font-bold text-xs uppercase tracking-widest">Обновить данные</button>
+
+            <hr class="opacity-10">
+
+            <div class="space-y-3">
+                <p class="text-xs font-bold uppercase opacity-50 italic">💰 Выдача средств</p>
+                <input type="number" id="admin-target-id" placeholder="Telegram ID" class="w-full p-4 rounded-xl border">
+                <input type="number" id="admin-give-amount" placeholder="Сумма (USDT)" class="w-full p-4 rounded-xl border">
+                <button onclick="adminGive()" class="w-full p-4 font-bold bg-red-500 text-white rounded-xl shadow-lg">Начислить баланс</button>
+            </div>
+
+            <hr class="opacity-10">
+
+            <div class="space-y-3">
+                <p class="text-xs font-bold uppercase opacity-50 italic">🎁 Генерация промо</p>
+                <input type="text" id="admin-promo-name" placeholder="CODE2026" class="w-full p-4 rounded-xl border font-mono">
+                <input type="number" id="admin-promo-val" placeholder="Номинал ($)" class="w-full p-4 rounded-xl border">
+                <button onclick="adminCreatePromo()" class="w-full p-4 font-bold bg-green-600 text-white rounded-xl shadow-lg">Создать промокод</button>
+            </div>
+
+            <hr class="opacity-10">
+
+            <div class="space-y-3">
+                <p class="text-xs font-bold uppercase opacity-50 italic">📢 Глобальная рассылка</p>
+                <textarea id="admin-broadcast" class="w-full p-4 h-24 rounded-xl border" placeholder="Текст сообщения для всех пользователей..."></textarea>
+                <button onclick="tg.showAlert('Функция в разработке')" class="w-full p-4 font-bold bg-black text-white rounded-xl">Начать рассылку</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
-
-        // Получение данных пользователя
+        tg.expand();
+        
+        // Данные пользователя
         const user = tg.initDataUnsafe?.user;
+        const ADMIN_ID = 8506833729; // Твой ID
+
         if (user) {
             document.getElementById('user-name').innerText = user.first_name || "Пользователь";
-        }
-
-        // Показать вкладку админа только для указанного ID
-        if (user && user.id === 8506833729) {
-            document.getElementById('btn-admin').classList.remove('hidden');
+            document.getElementById('user-id').innerText = user.id;
+            
+            // Проверка на админа
+            if (user.id === ADMIN_ID) {
+                document.getElementById('btn-admin').classList.remove('hidden');
+            }
         }
 
         // Переключение вкладок
@@ -111,37 +253,73 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
             document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById('btn-' + tabId).classList.add('tab-active');
+            
+            // Если кнопка навигации существует (не для внутренних вкладок типа promo-entry)
+            const navBtn = document.getElementById('btn-' + tabId);
+            if (navBtn) navBtn.classList.add('tab-active');
         }
 
-        // Функция: Пополнение баланса
+        // --- ЛОГИКА ПРОФИЛЯ ---
         function topUp() {
-            const amount = document.getElementById('topup-amount').value;
-            if(!amount || amount <= 0) return tg.showAlert("Введите корректную сумму");
-            tg.sendData(JSON.stringify({action: "topup", amount: amount}));
+            const val = document.getElementById('topup-amount').value;
+            if(!val || val <= 0) return tg.showAlert("Введите сумму пополнения");
+            tg.sendData(JSON.stringify({action: "topup", amount: val}));
         }
-        
-        // Функция: Активация промокода
+
         function activatePromo() {
             const code = document.getElementById('promo-code').value;
-            if(!code) return tg.showAlert("Введите промокод");
+            if(!code) return tg.showAlert("Введите код");
             tg.sendData(JSON.stringify({action: "activate_promo", code: code}));
         }
 
-        // Функция: Админ - Выдать баланс
-        function adminGive() {
-            const target_id = document.getElementById('target-id').value;
-            const amount = document.getElementById('give-amount').value;
-            if(!target_id || !amount) return tg.showAlert("Заполните ID и сумму");
-            tg.sendData(JSON.stringify({action: "admin_give", target_id: target_id, amount: amount}));
+        // --- ЛОГИКА КУПИТЬ ---
+        let selectedTariff = null;
+        function setTariff(days, price) {
+            selectedTariff = days;
+            document.querySelectorAll('.tariff-btn').forEach(b => b.classList.remove('border-blue-500', 'bg-blue-500/5'));
+            document.getElementById('t-' + days).classList.add('border-blue-500', 'bg-blue-500/5');
         }
 
-        // Функция: Админ - Создать промокод
-        function adminPromo() {
-            const code = document.getElementById('admin-promo-code').value;
-            const amount = document.getElementById('admin-promo-amount').value;
-            if(!code || !amount) return tg.showAlert("Заполните код и сумму");
-            tg.sendData(JSON.stringify({action: "admin_promo", code: code, amount: amount}));
+        function confirmPurchase() {
+            if(!selectedTariff) return tg.showAlert("Выберите тарифный план");
+            tg.showConfirm(`Вы хотите приобрести подписку на ${selectedTariff} дней?`, (ok) => {
+                if(ok) tg.sendData(JSON.stringify({action: "buy_with_balance", days: selectedTariff}));
+            });
+        }
+
+        // --- ЛОГИКА АДМИНКИ ---
+        function getStats() {
+            tg.sendData(JSON.stringify({action: "get_stats"}));
+            tg.showScanQrPopup({ text: "Запрос данных..." }); // Имитация ожидания
+            setTimeout(() => tg.closeScanQrPopup(), 1000);
+        }
+
+        function adminGive() {
+            const tid = document.getElementById('admin-target-id').value;
+            const amt = document.getElementById('admin-give-amount').value;
+            if(!tid || !amt) return tg.showAlert("Заполните все поля");
+            tg.sendData(JSON.stringify({action: "admin_give", target_id: tid, amount: amt}));
+        }
+
+        function adminCreatePromo() {
+            const name = document.getElementById('admin-promo-name').value;
+            const val = document.getElementById('admin-promo-val').value;
+            if(!name || !val) return tg.showAlert("Заполните данные промокода");
+            tg.sendData(JSON.stringify({action: "admin_promo", code: name, amount: val}));
+        }
+
+        // Вспомогательные функции
+        function copyKey() {
+            const copyText = document.getElementById("vless-link");
+            copyText.select();
+            document.execCommand("copy");
+            tg.showAlert("Ключ скопирован в буфер обмена!");
+        }
+
+        function deleteSubscription() {
+            tg.showConfirm("Вы уверены? Конфигурация будет аннулирована!", (yes) => {
+                if(yes) tg.sendData(JSON.stringify({action: "delete_sub"}));
+            });
         }
     </script>
 </body>
