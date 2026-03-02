@@ -3,106 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyer VPN App</title>
+    <title>Wyer VPN - Advanced Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* Применяем темы Telegram */
-        body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .card { background-color: var(--tg-theme-secondary-bg-color); border: 1px solid rgba(0,0,0,0.1); }
-        .tab-active { border-bottom: 2px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); font-weight: bold; }
+        /* Использование системных цветов Telegram для идеальной интеграции */
+        body { 
+            background-color: var(--tg-theme-bg-color); 
+            color: var(--tg-theme-text-color); 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
         
-        /* Стилизация элементов формы */
-        textarea, select { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: 1px solid rgba(0,0,0,0.1); }
+        /* Стилизация карточек */
+        .card { 
+            background-color: var(--tg-theme-secondary-bg-color); 
+            border-radius: 24px; 
+            border: 1px solid rgba(0,0,0,0.05); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
         
-        /* Стили для QR-кода */
-        #qrcode img { margin: 0 auto; display: block; }
+        /* Активная вкладка */
+        .tab-active { 
+            border-bottom: 3px solid var(--tg-theme-button-color); 
+            color: var(--tg-theme-button-color); 
+            font-weight: bold; 
+        }
+        
+        /* Скругленные кнопки с эффектом нажатия */
+        button { 
+            border-radius: 9999px; 
+            transition: all 0.2s ease; 
+        }
+        button:active { 
+            transform: scale(0.97); 
+            opacity: 0.9;
+        }
+        
+        /* Стилизация выпадающих списков и полей */
+        select, textarea { 
+            background-color: var(--tg-theme-bg-color); 
+            color: var(--tg-theme-text-color); 
+            border-radius: 16px; 
+            border: 1px solid rgba(0,0,0,0.1); 
+        }
+        
+        /* Центрирование QR-кода */
+        #qrcode img { 
+            margin: 0 auto; 
+            display: block; 
+        }
     </style>
 </head>
-<body class="p-4 font-sans text-sm">
+<body class="p-4 text-sm">
 
-    <div class="text-center mb-6">
-        <h1 class="text-3xl font-extrabold text-blue-500">Wyer VPN</h1>
-        <p class="text-xs opacity-70">Ваш надежный доступ в сеть</p>
+    <div class="text-center mb-6 pt-2">
+        <h1 class="text-4xl font-extrabold text-blue-500 tracking-tighter">Wyer VPN</h1>
+        <p class="text-xs opacity-60 mt-1">Центр управления подпиской</p>
     </div>
 
-    <div class="flex justify-around mb-6 border-b border-gray-300">
-        <button onclick="showTab('profile')" class="tab-button tab-active p-2" id="btn-profile">Профиль</button>
-        <button onclick="showTab('subscription')" class="tab-button p-2" id="btn-subscription">Подписка</button>
-        <button onclick="showTab('support')" class="tab-button p-2" id="btn-support">Поддержка</button>
+    <div class="flex justify-around mb-6 border-b border-gray-200">
+        <button onclick="showTab('profile')" class="tab-button tab-active p-4 flex-1 text-center" id="btn-profile">👤 Профиль</button>
+        <button onclick="showTab('subscription')" class="tab-button p-4 flex-1 text-center" id="btn-subscription">💎 Подписка</button>
     </div>
 
     <div id="profile" class="tab-content space-y-4">
-        <div class="card p-5 rounded-2xl shadow-lg space-y-3">
-            <div class="flex items-center gap-3">
-                <img id="user-avatar" src="" class="rounded-full w-14 h-14 border-2 border-blue-400 hidden" alt="Avatar">
-                <div id="avatar-placeholder" class="rounded-full w-14 h-14 border-2 border-blue-400 flex items-center justify-center text-xl bg-gray-300">👤</div>
-                
+        <div class="card p-6 space-y-5">
+            <div class="flex items-center gap-4">
+                <img id="user-avatar" src="" class="rounded-full w-16 h-16 border-4 border-blue-100 hidden" alt="Avatar">
+                <div id="avatar-placeholder" class="rounded-full w-16 h-16 border-4 border-blue-100 flex items-center justify-center text-2xl bg-gray-200 font-bold">👤</div>
                 <div>
-                    <p class="text-lg font-bold" id="user-name">@username</p>
-                    <p class="text-xs opacity-70">ID: <span id="user-id">000000</span></p>
+                    <p class="text-2xl font-bold tracking-tight" id="user-name">@username</p>
+                    <p class="text-xs opacity-60">ID: <span id="user-id">000000</span></p>
                 </div>
             </div>
             
-            <div class="border-t border-gray-200 pt-3 flex justify-between">
-                <span>Баланс:</span>
-                <span class="font-bold text-lg text-green-500" id="user-balance">0$</span>
-            </div>
-            <div class="flex justify-between">
-                <span>Уровень:</span>
-                <span class="font-bold" id="user-lvl">0</span>
-            </div>
-            <div class="flex justify-between">
-                <span>Скидка:</span>
-                <span class="font-bold" id="user-discount">0%</span>
+            <div class="border-t border-gray-100 pt-4 space-y-3">
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
+                    <span class="font-medium">Баланс:</span>
+                    <span class="font-bold text-xl text-green-600" id="user-balance">0$</span>
+                </div>
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
+                    <span class="font-medium">Уровень:</span>
+                    <span class="font-bold text-lg" id="user-lvl">0</span>
+                </div>
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
+                    <span class="font-medium">Скидка:</span>
+                    <span class="font-bold text-lg text-blue-500" id="user-discount">0%</span>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="subscription" class="tab-content space-y-4 hidden">
-        <div class="card p-4 rounded-xl shadow-md space-y-3">
-            <p><strong>Активна до:</strong> <span id="sub-date" class="text-blue-500 font-bold">...</span></p>
+        <div class="card p-5 space-y-4">
+            <div class="text-center bg-blue-50 p-3 rounded-xl">
+                <p class="text-sm">Активна до: <span id="sub-date" class="text-blue-700 font-bold">20.03.2026</span></p>
+            </div>
             
-            <div class="flex justify-center items-center bg-white p-2 rounded-lg">
+            <div class="flex justify-center items-center bg-white p-4 rounded-3xl shadow-inner">
                 <div id="qrcode"></div>
             </div>
             
-            <p class="font-bold">Ваша ссылка VLESS:</p>
-            <textarea id="vless-link" class="w-full p-3 rounded-lg text-xs h-24" readonly></textarea>
+            <div>
+                <label class="block mb-2 font-bold opacity-80">Ваша ссылка VLESS:</label>
+                <textarea id="vless-link" class="w-full p-4 text-xs h-20" readonly></textarea>
+            </div>
             
-            <p class="font-bold mt-2">Выберите тариф:</p>
-            <select id="tariff-select" class="w-full p-3 rounded-lg font-bold">
-                <option value="7">7 дней - 0.5$</option>
-                <option value="30">1 месяц - 1.5$</option>
-                <option value="90">3 месяца - 4$</option>
-                <option value="180">6 месяцев - 7$</option>
-                <option value="365">1 год - 12$</option>
-            </select>
+            <div>
+                <label class="block mb-2 font-bold opacity-80">Выберите тариф:</label>
+                <select id="tariff-select" class="w-full p-4 font-bold text-base">
+                    <option value="7">7 дней - 0.5$</option>
+                    <option value="30">1 месяц - 1.5$</option>
+                    <option value="90">3 месяца - 4$</option>
+                    <option value="365">1 год - 12$</option>
+                </select>
+            </div>
             
-            <button onclick="copyLink()" class="w-full bg-gray-600 text-white p-3 rounded-lg font-bold">Скопировать</button>
-            <button onclick="buySubscription()" class="w-full bg-green-600 text-white p-3 rounded-lg font-bold">💎 Оплатить</button>
-        </div>
-    </div>
-
-    <div id="support" class="tab-content hidden text-center">
-        <div class="card p-6 rounded-xl shadow-md">
-            <h2 class="text-xl font-bold mb-2">Техническая поддержка</h2>
-            <p class="mb-4 opacity-80">Нужна помощь? Напишите нам в чат, мы ответим в течение 15 минут.</p>
-            <a href="https://t.me/WyerVPNsupportBot" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-bold w-full">Открыть чат</a>
+            <button onclick="buySubscription()" class="w-full bg-green-500 text-white p-5 font-extrabold text-lg shadow-lg">
+                💎 Оплатить
+            </button>
         </div>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
+        // Инициализация Telegram WebApp API
         const tg = window.Telegram.WebApp;
         tg.expand(); // Развернуть на весь экран
         const user = tg.initDataUnsafe?.user;
 
-        // Заполнение данных пользователя
+        // Заполнение данных пользователя из Telegram
         if (user) {
             document.getElementById('user-id').innerText = user.id;
-            document.getElementById('user-name').innerText = "@" + user.username;
+            document.getElementById('user-name').innerText = user.first_name || "@" + user.username;
             if (user.photo_url) {
                 const avatarImg = document.getElementById('user-avatar');
                 const placeholder = document.getElementById('avatar-placeholder');
@@ -113,53 +146,23 @@
         }
 
         // --- ЛОГИКА ДАННЫХ (ЗАГЛУШКА) ---
-        const balance = 0; // В реальном проекте тут fetch с сервера
+        // В реальном проекте данные загружаются через fetch с сервера
+        const balance = 0; 
         document.getElementById('user-balance').innerText = balance + "$";
         
-        // Расчет уровня и скидки
+        // Расчет уровня и скидки на основе баланса
         const level = Math.floor(balance / 5); 
         const discount = level * 1; 
         document.getElementById('user-lvl').innerText = level;
         document.getElementById('user-discount').innerText = discount + "%";
 
-        document.getElementById('sub-date').innerText = "20.03.2026";
+        // Заглушка ссылки
         const vlessLink = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
         document.getElementById('vless-link').value = vlessLink;
 
         // Генерация QR-кода
         new QRCode(document.getElementById("qrcode"), {
-            text: vlessLink,
-            width: 170, height: 170,
-            colorDark : "#000000", colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
-
-        // --- ФУНКЦИИ ---
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
-            document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById('btn-' + tabId).classList.add('tab-active');
-        }
-
-        function copyLink() {
-            const copyText = document.getElementById("vless-link");
-            copyText.select();
-            document.execCommand("copy");
-            tg.showAlert("Ссылка скопирована в буфер обмена!");
-        }
-
-        // --- ФУНКЦИЯ ПОКУПКИ С ЗАКРЫТИЕМ ---
-        function buySubscription() {
-            const days = document.getElementById("tariff-select").value;
-            // Отправляем данные на сервер бота
-            tg.sendData(JSON.stringify({action: "buy_sub", user_id: user.id, days: days}));
-            
-            tg.showAlert("Обрабатываю заказ, перехожу к оплате...");
-            
-            // ЗАКРЫВАЕМ ОКНО
-            tg.close();
-        }
-    </script>
-</body>
-</html>
+            text: vlessLink, 
+            width: 170, 
+            height: 170, 
+            correctLevel:
