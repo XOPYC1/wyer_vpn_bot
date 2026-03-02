@@ -1,0 +1,25 @@
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; }
+
+/* Шапка */
+header { background: #333; color: white; padding: 15px; display: flex; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; }
+.burger-menu { font-size: 24px; cursor: pointer; margin-right: 20px; }
+.logo { font-size: 20px; font-weight: bold; }
+
+/* Меню */
+.sidebar { height: 100%; width: 0; position: fixed; top: 50px; left: 0; background: #222; overflow-x: hidden; transition: 0.3s; padding-top: 20px; z-index: 999; }
+.sidebar a { padding: 15px 25px; text-decoration: none; font-size: 18px; color: white; display: block; transition: 0.2s; }
+.sidebar a:hover { background-color: #444; }
+.sidebar.open { width: 250px; }
+
+/* Контент */
+main { padding: 80px 20px 20px 20px; }
+.content-section { display: none; }
+.content-section.active { display: block; }
+
+/* Тарифы */
+.tariffs { display: flex; flex-direction: column; gap: 10px; }
+.tariff-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; font-weight: bold; cursor: pointer; }
+
+/* Подписка */
+.qr-code { width: 150px; height: 150px; background: #ccc; margin: 20px auto; display: flex; align-items: center; justify-content: center; }
+.vless-key { background: #eee; padding: 10px; word-break: break-all; border-radius: 5px; }
