@@ -18,7 +18,7 @@
         #qrcode img { margin: 0 auto; display: block; }
     </style>
 </head>
-<body class="p-4 text-sm">
+<body class="p-4 text-sm pt-10">
 
     <div class="text-center mb-6 pt-2">
         <h1 class="text-4xl font-extrabold text-blue-500 tracking-tighter">Wyer VPN</h1>
@@ -82,7 +82,7 @@
                 <div id="accordion" class="accordion-content space-y-2 rounded-xl p-2">
                     <button onclick="selectTariff('7', '7 дней - 0.5$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">7 дней - 0.5$</button>
                     <button onclick="selectTariff('30', '1 месяц - 1.5$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">1 месяц - 1.5$</button>
-                    <button onclick="selectTariff('90', '3 месяца - 4$')" class="w-full text-cl left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">3 месяца - 4$</button>
+                    <button onclick="selectTariff('90', '3 месяца - 4$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">3 месяца - 4$</button>
                     <button onclick="selectTariff('365', '1 год - 12$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">1 год - 12$</button>
                 </div>
             </div>
@@ -106,7 +106,7 @@
         tg.expand();
         const user = tg.initDataUnsafe?.user;
 
-        let hasSubscription = true; // ЛОГИКА ИЗ БАЗЫ
+        let hasSubscription = true; 
         
         const subDateEl = document.getElementById('sub-date');
         const qrContainer = document.getElementById('qr-container');
@@ -159,23 +159,19 @@
             toggleAccordion();
         }
 
-        // --- ЛОГИКА ОПЛАТЫ (ЧЕРЕЗ БОТА) ---
         function buySubscription() {
             if (!selectedTariffDays) {
                 tg.showAlert("Пожалуйста, выберите тариф");
                 return;
             }
             
-            // Отправляем запрос боту, чтобы он создал инвойс
             tg.sendData(JSON.stringify({action: "create_invoice", days: selectedTariffDays}));
             
-            // Бот должен прислать ссылку, но пока закроем окно
             tg.showAlert("Открываю Crypto Bot...");
             setTimeout(() => {
                 tg.close();
             }, 1000);
         }
-        // ----------------------------------
 
         function deleteSubscription() {
             if(!hasSubscription) {
