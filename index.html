@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* Использование системных цветов Telegram для фона и текста */
+        /* Использование системных цветов Telegram */
         body { 
             background-color: var(--tg-theme-bg-color); 
             color: var(--tg-theme-text-color); 
@@ -29,35 +29,27 @@
             font-weight: bold; 
         }
         
-        /* КНОПКИ - ИСПРАВЛЕНО (Используют цвет темы) */
-        button, a.button-style { 
+        /* Кнопки */
+        .button-theme { 
             background-color: var(--tg-theme-button-color);
             color: var(--tg-theme-button-text-color);
             border-radius: 9999px; 
             transition: all 0.2s ease; 
         }
+
+        /* Выпадающий список (Аккордеон) */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
         
-        /* Поля ввода и выпадающий список - ИСПРАВЛЕНО (Текст тёмный) */
-        select, textarea { 
-            background-color: var(--tg-theme-secondary-bg-color); 
+        /* Поля ввода */
+        textarea { 
+            background-color: var(--tg-theme-bg-color); 
             color: var(--tg-theme-text-color); 
             border-radius: 16px; 
             border: 1px solid rgba(0,0,0,0.1); 
-            appearance: none;
-            -webkit-appearance: none;
-            padding-right: 2rem;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 0.65rem auto;
-        }
-        
-        /* ТЕКСТ В КАРТОЧКАХ - ИСПРАВЛЕНО (Контраст) */
-        .card-text {
-            color: var(--tg-theme-text-color);
-        }
-        .card-hint {
-            color: var(--tg-theme-hint-color);
         }
         
         /* QR-код */
@@ -82,22 +74,22 @@
                 <img id="user-avatar" src="" class="rounded-full w-16 h-16 border-4 border-blue-100 hidden" alt="Avatar">
                 <div id="avatar-placeholder" class="rounded-full w-16 h-16 border-4 border-blue-100 flex items-center justify-center text-2xl bg-gray-200 font-bold">👤</div>
                 <div>
-                    <p class="text-2xl font-bold tracking-tight card-text" id="user-name">@username</p>
-                    <p class="text-xs card-hint">ID: <span id="user-id">000000</span></p>
+                    <p class="text-2xl font-bold tracking-tight" id="user-name">@username</p>
+                    <p class="text-xs opacity-60">ID: <span id="user-id">000000</span></p>
                 </div>
             </div>
             
             <div class="border-t border-gray-100 pt-4 space-y-3">
                 <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50/50">
-                    <span class="font-medium card-hint">Баланс:</span>
+                    <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Баланс:</span>
                     <span class="font-bold text-xl text-green-600" id="user-balance">0$</span>
                 </div>
                 <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50/50">
-                    <span class="font-medium card-hint">Уровень:</span>
-                    <span class="font-bold text-lg card-text" id="user-lvl">0</span>
+                    <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Уровень:</span>
+                    <span class="font-bold text-lg" style="color: var(--tg-theme-text-color)" id="user-lvl">0</span>
                 </div>
                 <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50/50">
-                    <span class="font-medium card-hint">Скидка:</span>
+                    <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Скидка:</span>
                     <span class="font-bold text-lg text-blue-500" id="user-discount">0%</span>
                 </div>
             </div>
@@ -106,8 +98,8 @@
 
     <div id="subscription" class="tab-content space-y-4 hidden">
         <div class="card p-5 space-y-4">
-            <div class="text-center bg-gray-100 p-3 rounded-xl">
-                <p class="text-sm card-text">Активна до: <span id="sub-date" class="text-blue-700 font-bold">20.03.2026</span></p>
+            <div class="text-center p-3 rounded-xl" style="background-color: var(--tg-theme-bg-color)">
+                <p class="text-sm" style="color: var(--tg-theme-text-color)">Активна до: <span id="sub-date" class="font-bold" style="color: var(--tg-theme-button-color)">20.03.2026</span></p>
             </div>
             
             <div class="flex justify-center items-center bg-white p-4 rounded-3xl shadow-inner">
@@ -115,21 +107,25 @@
             </div>
             
             <div>
-                <label class="block mb-2 font-bold card-text">Ссылка VLESS:</label>
+                <label class="block mb-2 font-bold opacity-80" style="color: var(--tg-theme-text-color)">Ссылка VLESS:</label>
                 <textarea id="vless-link" class="w-full p-4 text-xs h-20" readonly></textarea>
             </div>
             
-            <div>
-                <label class="block mb-2 font-bold card-text">Выберите тариф:</label>
-                <select id="tariff-select" class="w-full p-4 font-bold text-base">
-                    <option value="7">7 дней - 0.5$</option>
-                    <option value="30">1 месяц - 1.5$</option>
-                    <option value="90">3 месяца - 4$</option>
-                    <option value="365">1 год - 12$</option>
-                </select>
+            <div class="space-y-2">
+                <label class="block mb-2 font-bold opacity-80" style="color: var(--tg-theme-text-color)">Выберите тариф:</label>
+                <button onclick="toggleAccordion()" class="w-full text-left p-4 rounded-xl flex justify-between items-center" style="background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color)">
+                    <span id="selected-tariff">Выберите...</span>
+                    <span>▼</span>
+                </button>
+                <div id="accordion" class="accordion-content space-y-2 rounded-xl p-2" style="background-color: var(--tg-theme-bg-color)">
+                    <button onclick="selectTariff('7', '7 дней - 0.5$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">7 дней - 0.5$</button>
+                    <button onclick="selectTariff('30', '1 месяц - 1.5$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">1 месяц - 1.5$</button>
+                    <button onclick="selectTariff('90', '3 месяца - 4$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">3 месяца - 4$</button>
+                    <button onclick="selectTariff('365', '1 год - 12$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">1 год - 12$</button>
+                </div>
             </div>
             
-            <button onclick="buySubscription()" class="w-full p-5 font-extrabold text-lg shadow-lg">
+            <button onclick="buySubscription()" class="button-theme w-full p-5 font-extrabold text-lg shadow-lg">
                 💎 Оплатить
             </button>
         </div>
@@ -137,9 +133,9 @@
 
     <div id="support" class="tab-content hidden">
         <div class="card p-6 text-center space-y-4">
-            <h2 class="text-2xl font-bold card-text">Техническая поддержка</h2>
-            <p class="card-hint">Возникли проблемы? Напишите нам, мы ответим в течение 15 минут.</p>
-            <a href="https://t.me/WyerVPNsupportBot" class="button-style inline-block w-full p-4 font-bold text-base shadow-md">
+            <h2 class="text-2xl font-bold" style="color: var(--tg-theme-text-color)">Техническая поддержка</h2>
+            <p class="opacity-70" style="color: var(--tg-theme-text-color)">Возникли проблемы? Напишите нам, мы ответим в течение 15 минут.</p>
+            <a href="https://t.me/WyerVPNsupportBot" class="button-theme inline-block w-full p-4 font-bold text-base shadow-md">
                 💬 Написать боту
             </a>
         </div>
@@ -175,6 +171,7 @@
             text: vlessLink, width: 170, height: 170, correctLevel: QRCode.CorrectLevel.H
         });
 
+        // Логика переключения вкладок
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
@@ -182,10 +179,27 @@
             document.getElementById('btn-' + tabId).classList.add('tab-active');
         }
 
+        // Логика аккордеона
+        let selectedTariffDays = null;
+        function toggleAccordion() {
+            const accordion = document.getElementById('accordion');
+            accordion.style.maxHeight = accordion.style.maxHeight ? null : accordion.scrollHeight + "px";
+        }
+
+        function selectTariff(days, text) {
+            selectedTariffDays = days;
+            document.getElementById('selected-tariff').innerText = text;
+            toggleAccordion(); // Закрыть после выбора
+        }
+
         function buySubscription() {
-            const days = document.getElementById("tariff-select").value;
-            tg.sendData(JSON.stringify({action: "buy_sub", days: days}));
-            tg.showAlert("Обрабатываю заказ...");
+            if (!selectedTariffDays) {
+                tg.showAlert("Пожалуйста, выберите тариф");
+                return;
+            }
+            tg.sendData(JSON.stringify({action: "buy_sub", days: selectedTariffDays}));
+            tg.showAlert("Обрабатываю заказ, перехожу к оплате в чате...");
+            tg.close();
         }
     </script>
 </body>
