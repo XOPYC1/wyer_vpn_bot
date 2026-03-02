@@ -6,6 +6,7 @@
     <title>Wyer VPN App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
         .card { background-color: var(--tg-theme-secondary-bg-color); }
@@ -36,6 +37,11 @@
     <div id="subscription" class="tab-content space-y-4 hidden">
         <div class="card p-4 rounded-xl shadow-md space-y-3">
             <p><strong>Действует до:</strong> <span id="sub-date">...</span></p>
+            
+            <div class="bg-white p-2 rounded-lg text-center flex justify-center">
+                <div id="qrcode"></div>
+            </div>
+            
             <p class="font-bold">Ссылка VLESS:</p>
             <input type="text" id="vless-link" class="w-full p-2 rounded bg-white text-black" value="vless://..." readonly>
             <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold">Скопировать ссылку</button>
@@ -53,29 +59,31 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. Данные пользователя из Telegram
         const user = tg.initDataUnsafe?.user;
         if (user) {
             document.getElementById('user-id').innerText = user.id;
             document.getElementById('user-name').innerText = "@" + user.username;
         }
 
-        // 2. РАСЧЕТ УРОВНЯ И СКИДКИ (Логика)
-        // Для примера ставим баланс 12$, но потом его нужно брать из базы
-        const balance = 12; 
+        // --- ЛОГИКА ---
+        const balance = 12; // Временный баланс
         document.getElementById('user-balance').innerText = balance;
-        
-        const level = Math.floor(balance / 5) + 1; // Уровень каждые 5$
-        const discount = (level - 1) * 1; // 1% за уровень
-        
+        const level = Math.floor(balance / 5) + 1;
+        const discount = (level - 1) * 1;
         document.getElementById('user-lvl').innerText = level;
         document.getElementById('user-discount').innerText = discount;
 
-        // 3. Данные подписки (временно статика)
+        const vlessLink = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
         document.getElementById('sub-date').innerText = "20.03.2026";
-        document.getElementById('vless-link').value = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
+        document.getElementById('vless-link').value = vlessLink;
 
-        // Переключение вкладок
+        // --- ГЕНЕРАЦИЯ QR-КОДА ---
+        new QRCode(document.getElementById("qrcode"), {
+            text: vlessLink,
+            width: 150,
+            height: 150,
+        });
+
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
@@ -83,9 +91,7 @@
             document.getElementById('btn-' + tabId).classList.add('tab-active');
         }
 
-        // Копирование ссылки
         function copyLink() {
-            const vlessLink = document.getElementById('vless-link').value;
             navigator.clipboard.writeText(vlessLink);
             tg.showAlert("Ссылка скопирована!");
         }
