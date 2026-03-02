@@ -3,73 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyer VPN</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Wyer VPN Profile</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--tg-theme-bg-color, #ffffff); color: var(--tg-theme-text-color, #000000); margin: 0; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; }
+        .card { background-color: var(--tg-theme-secondary-bg-color, #f4f4f5); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        h3 { margin-top: 0; color: var(--tg-theme-hint-color, #999999); font-size: 14px; }
+        p { margin: 5px 0; font-size: 16px; font-weight: bold; }
+        .key-box { background-color: #e0e0e0; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; margin-top: 10px; }
+        .ref-box { background-color: var(--tg-theme-button-color, #3390ec); color: var(--tg-theme-button-text-color, #ffffff); padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; }
+        .instruction { display: none; margin-top: 10px; font-size: 13px; color: var(--tg-theme-text-color); }
+        button { background-color: var(--tg-theme-button-color, #3390ec); color: var(--tg-theme-button-text-color, #ffffff); border: none; padding: 10px; border-radius: 8px; width: 100%; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Личный кабинет</h2>
 
-    <header>
-        <div class="burger-menu" onclick="toggleMenu()">
-            &#9776; </div>
-        <div class="logo">Wyer VPN</div>
-    </header>
+        <div class="card">
+            <h3>🆔 ID</h3>
+            <p id="user-id">Загрузка...</p>
+        </div>
 
-    <nav id="sidebar" class="sidebar">
-        <a href="#" onclick="showSection('buy')">Купить подписку</a>
-        <a href="#" onclick="showSection('account')">Аккаунт</a>
-        <a href="#" onclick="showSection('subscription')">Моя подписка</a>
-        <a href="#" onclick="showSection('contacts')">Контакты</a>
-    </nav>
+        <div class="card">
+            <h3>👤 Никнейм (можно менять в боте)</h3>
+            <p id="user-nickname">Загрузка...</p>
+        </div>
 
-    <main>
-        <section id="buy" class="content-section active">
-            <h1>Купить подписку</h1>
-            <div class="tariffs">
-                <div class="tariff-card">1 месяц - 1.5$</div>
-                <div class="tariff-card">3 месяца - 4$</div>
-                <div class="tariff-card">6 месяцев - 7$</div>
-                <div class="tariff-card">1 год - 12$</div>
+        <div class="card">
+            <h3>📊 Username</h3>
+            <p id="user-username">Загрузка...</p>
+        </div>
+
+        <div class="card">
+            <h3>⏱ Статус подписки</h3>
+            <p id="sub-status">Проверка...</p>
+        </div>
+
+        <div class="card">
+            <h3>🔑 Ваш Vless Ключ</h3>
+            <div id="vless-key" class="key-box">Загрузка...</div>
+            <button onclick="copyKey()">Копировать ключ</button>
+        </div>
+
+        <div class="card">
+            <h3>🔗 Реферальная ссылка</h3>
+            <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Приглашайте друзей и получайте 30% от их покупок!</p>
+            <div id="ref-link" class="ref-box">Загрузка...</div>
+        </div>
+
+        <div class="card">
+            <h3>📖 Инструкция</h3>
+            <button onclick="toggleInstruction()">Показать/Скрыть инструкцию</button>
+            <div id="instruction-text" class="instruction">
+                <strong>iOS (Shadowrocket):</strong> 1. Скопируйте ключ. 2. Откройте Shadowrocket, он автоматически предложит добавить сервер.
+                <br><br>
+                <strong>Android (v2rayNG):</strong> 1. Скопируйте ключ. 2. Откройте v2rayNG, нажмите "+" -> "Импортировать конфиг из буфера обмена".
+                <br><br>
+                <strong>Windows (Nekoray):</strong> 1. Скопируйте ключ. 2. Откройте Nekoray, нажмите "Настройки" -> "Добавить профиль из буфера обмена".
             </div>
-        </section>
-
-        <section id="account" class="content-section">
-            <h1>Аккаунт</h1>
-            <p>Логин: user@example.com</p>
-            <p>Ник: Пользователь</p>
-        </section>
-
-        <section id="subscription" class="content-section">
-            <h1>Моя подписка</h1>
-            <p>Срок действия: активна</p>
-            <p>Заканчивается: 01.01.2027</p>
-            <div class="qr-code"> [Здесь будет QR-код] </div>
-            <div class="vless-key">vless://...ключ...</div>
-        </section>
-
-        <section id="contacts" class="content-section">
-            <h1>Контакты</h1>
-            <p>Почта: <a href="mailto:wyer.sup@gmail.com">wyer.sup@gmail.com</a></p>
-            <p>TG Поддержка: <a href="https://t.me/WyerVPNsupportBot">@WyerVPNsupportBot</a></p>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <script>
-        // Функция для открытия/закрытия меню
-        function toggleMenu() {
-            document.getElementById("sidebar").classList.toggle("open");
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Данные из Telegram
+        document.getElementById('user-id').innerText = tg.initDataUnsafe.user.id;
+        document.getElementById('user-username').innerText = '@' + tg.initDataUnsafe.user.username;
+
+        // --- ВАЖНО ---
+        // Чтобы получить nickname, sub_status и vless_key, 
+        // нужно отправлять запрос к твоему боту (main.py), 
+        // который будет брать данные из SQLite.
+        // Сейчас поставим заглушки.
+        document.getElementById('user-nickname').innerText = tg.initDataUnsafe.user.first_name;
+        document.getElementById('sub-status').innerText = 'Активна';
+        document.getElementById('vless-key').innerText = 'vless://...ваш_ключ...';
+        document.getElementById('ref-link').innerText = 'https://t.me/WyerVPN_bot?start=' + tg.initDataUnsafe.user.id;
+
+        function copyKey() {
+            const key = document.getElementById('vless-key').innerText;
+            navigator.clipboard.writeText(key);
+            tg.showAlert('Ключ скопирован!');
         }
 
-        // Функция для переключения разделов
-        function showSection(sectionId) {
-            // Скрыть все секции
-            let sections = document.querySelectorAll('.content-section');
-            sections.forEach(sec => sec.classList.remove('active'));
-            
-            // Показать нужную
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Закрыть меню
-            document.getElementById("sidebar").classList.remove("open");
+        function toggleInstruction() {
+            const el = document.getElementById('instruction-text');
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
         }
     </script>
 </body>
