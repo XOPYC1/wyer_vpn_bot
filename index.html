@@ -15,8 +15,8 @@
         /* Стилизация поле ввода под тему */
         textarea { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: 1px solid rgba(0,0,0,0.1); }
         
-        /* Подгонка размера QR кода */
-        #qrcode img { margin: 0 auto; }
+        /* УБИРАЕМ ПОЛЯ QR */
+        #qrcode img { margin: 0 auto; display: block; }
     </style>
 </head>
 <body class="p-4 font-sans text-sm">
@@ -61,8 +61,8 @@
         <div class="card p-4 rounded-xl shadow-md space-y-3">
             <p><strong>Активна до:</strong> <span id="sub-date" class="text-blue-500 font-bold">...</span></p>
             
-            <div class="flex justify-center items-center">
-                <div id="qrcode" class="bg-white p-2 rounded-lg"></div>
+            <div class="flex justify-center items-center bg-white p-2 rounded-lg">
+                <div id="qrcode"></div>
             </div>
             
             <p class="font-bold">Ссылка VLESS:</p>
@@ -109,7 +109,7 @@
         document.getElementById('sub-date').innerText = "20.03.2026";
         document.getElementById('vless-link').value = vlessLink;
 
-        // --- ГЕНЕРАЦИЯ QR-КОДА ---
+        // --- ГЕНЕРАЦИЯ QR-КОДА БЕЗ ПОЛЕЙ ---
         new QRCode(document.getElementById("qrcode"), {
             text: vlessLink,
             width: 170,
