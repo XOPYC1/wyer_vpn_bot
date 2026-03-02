@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* Использование системных цветов Telegram для единого стиля */
+        /* Использование системных цветов Telegram */
         body { 
             background-color: var(--tg-theme-bg-color); 
             color: var(--tg-theme-text-color); 
@@ -29,27 +29,27 @@
             font-weight: bold; 
         }
         
-        /* Стилизация всех кнопок под тему */
+        /* Кнопки */
         .button-theme { 
             background-color: var(--tg-theme-button-color);
             color: var(--tg-theme-button-text-color);
             border-radius: 9999px; 
             transition: all 0.2s ease; 
         }
+
+        /* Выпадающий список (Аккордеон) */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
         
-        /* Поля ввода и выпадающий список */
-        select, textarea { 
+        /* Поля ввода */
+        textarea { 
             background-color: var(--tg-theme-bg-color); 
             color: var(--tg-theme-text-color); 
             border-radius: 16px; 
             border: 1px solid rgba(0,0,0,0.1); 
-            padding-right: 2rem;
-            appearance: none;
-            -webkit-appearance: none;
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 0.65rem auto;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
         }
         
         /* QR-код */
@@ -111,14 +111,18 @@
                 <textarea id="vless-link" class="w-full p-4 text-xs h-20" readonly></textarea>
             </div>
             
-            <div>
+            <div class="space-y-2">
                 <label class="block mb-2 font-bold opacity-80" style="color: var(--tg-theme-text-color)">Выберите тариф:</label>
-                <select id="tariff-select" class="w-full p-4 font-bold text-base">
-                    <option value="7">7 дней - 0.5$</option>
-                    <option value="30">1 месяц - 1.5$</option>
-                    <option value="90">3 месяца - 4$</option>
-                    <option value="365">1 год - 12$</option>
-                </select>
+                <button onclick="toggleAccordion()" class="w-full text-left p-4 rounded-xl flex justify-between items-center" style="background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color)">
+                    <span id="selected-tariff">Выберите...</span>
+                    <span>▼</span>
+                </button>
+                <div id="accordion" class="accordion-content space-y-2 bg-gray-50 rounded-xl p-2">
+                    <button onclick="selectTariff('7', '7 дней - 0.5$')" class="w-full text-left p-3 rounded-lg hover:bg-gray-100" style="color: var(--tg-theme-text-color)">7 дней - 0.5$</button>
+                    <button onclick="selectTariff('30', '1 месяц - 1.5$')" class="w-full text-left p-3 rounded-lg hover:bg-gray-100" style="color: var(--tg-theme-text-color)">1 месяц - 1.5$</button>
+                    <button onclick="selectTariff('90', '3 месяца - 4$')" class="w-full text-left p-3 rounded-lg hover:bg-gray-100" style="color: var(--tg-theme-text-color)">3 месяца - 4$</button>
+                    <button onclick="selectTariff('365', '1 год - 12$')" class="w-full text-left p-3 rounded-lg hover:bg-gray-100" style="color: var(--tg-theme-text-color)">1 год - 12$</button>
+                </div>
             </div>
             
             <button onclick="buySubscription()" class="button-theme w-full p-5 font-extrabold text-lg shadow-lg">
@@ -167,6 +171,7 @@
             text: vlessLink, width: 170, height: 170, correctLevel: QRCode.CorrectLevel.H
         });
 
+        // Логика переключения вкладок
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
@@ -174,9 +179,25 @@
             document.getElementById('btn-' + tabId).classList.add('tab-active');
         }
 
+        // Логика аккордеона
+        let selectedTariffDays = null;
+        function toggleAccordion() {
+            const accordion = document.getElementById('accordion');
+            accordion.style.maxHeight = accordion.style.maxHeight ? null : accordion.scrollHeight + "px";
+        }
+
+        function selectTariff(days, text) {
+            selectedTariffDays = days;
+            document.getElementById('selected-tariff').innerText = text;
+            toggleAccordion(); // Закрыть после выбора
+        }
+
         function buySubscription() {
-            const days = document.getElementById("tariff-select").value;
-            tg.sendData(JSON.stringify({action: "buy_sub", days: days}));
+            if (!selectedTariffDays) {
+                tg.showAlert("Пожалуйста, выберите тариф");
+                return;
+            }
+            tg.sendData(JSON.stringify({action: "buy_sub", days: selectedTariffDays}));
             tg.showAlert("Обрабатываю заказ, перехожу к оплате в чате...");
             tg.close();
         }
