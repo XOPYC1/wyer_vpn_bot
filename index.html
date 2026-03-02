@@ -3,78 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyer VPN</title>
+    <title>Wyer VPN App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Применяем цвета из темы Telegram */
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
         .card { background-color: var(--tg-theme-secondary-bg-color); }
-        .btn-primary { background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
+        .tab-active { border-bottom: 2px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); }
     </style>
 </head>
-<body class="p-4 font-sans">
-    
-    <div class="card rounded-xl p-4 shadow-lg mb-6 text-center">
-        <h1 id="user-name" class="text-xl font-bold">Загрузка...</h1>
+<body class="p-4 font-sans text-sm">
+
+    <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold">Wyer VPN</h1>
     </div>
 
-    <div class="space-y-4">
-        
-        <div class="card p-4 rounded-xl flex justify-between items-center shadow-sm">
-            <div class="flex items-center gap-3">
-                <span class="text-3xl">🇸🇪</span>
-                <div>
-                    <h2 class="font-bold text-lg">Швеция</h2>
-                    <p class="text-xs opacity-70">Быстрый</p>
-                </div>
-            </div>
-            <span class="text-xs opacity-50">Выбрано</span>
+    <div class="flex justify-around mb-6 border-b border-gray-300">
+        <button onclick="showTab('profile')" class="tab-button tab-active p-2" id="btn-profile">Профиль</button>
+        <button onclick="showTab('subscription')" class="tab-button p-2" id="btn-subscription">Подписка</button>
+        <button onclick="showTab('support')" class="tab-button p-2" id="btn-support">Поддержка</button>
+    </div>
+
+    <div id="profile" class="tab-content space-y-4">
+        <div class="card p-4 rounded-xl shadow-md">
+            <p><strong>ID:</strong> <span id="user-id"></span></p>
+            <p><strong>Ник:</strong> <span id="user-name"></span></p>
+            <p><strong>Уровень:</strong> <span id="user-lvl">1</span> (<span id="user-discount">0</span>% скидка)</p>
         </div>
-        
-        <div class="card p-4 rounded-xl flex justify-between items-center shadow-sm">
-            <div class="flex items-center gap-3">
-                <span class="text-3xl">🇺🇸</span>
-                <div>
-                    <h2 class="font-bold text-lg">США</h2>
-                    <p class="text-xs opacity-70">YouTube</p>
-                </div>
+    </div>
+
+    <div id="subscription" class="tab-content space-y-4 hidden">
+        <div class="card p-4 rounded-xl shadow-md space-y-3">
+            <p><strong>Действует до:</strong> <span id="sub-date">31.12.2026</span></p>
+            <p class="font-bold">Инструкция:</p>
+            <p class="text-xs opacity-80">1. Скопируйте ссылку. 2. Откройте V2Raytun. 3. Нажмите "+" -> "Import from Clipboard".</p>
+            <div class="bg-white p-2 rounded-lg text-center">
+                <p class="text-gray-500">[QR КОД]</p>
             </div>
-            <span class="text-xs opacity-50">Выбрано</span>
+            <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold">Скопировать VLESS</button>
+        </div>
+    </div>
+
+    <div id="support" class="tab-content hidden text-center">
+        <div class="card p-6 rounded-xl shadow-md">
+            <p class="mb-4">Нужна помощь? Напишите в поддержку:</p>
+            <a href="https://t.me/WyerVPNsupportBot" class="bg-blue-600 text-white p-3 rounded-lg font-bold">Открыть чат с поддержкой</a>
         </div>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрыть на весь экран
-        
-        // Получение данных пользователя
-        try {
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                document.getElementById('user-name').innerText = "Привет, " + user.first_name;
-            } else {
-                document.getElementById('user-name').innerText = "Привет, Пользователь";
-            }
-        } catch (e) {
-            document.getElementById('user-name').innerText = "Привет, Гость";
+        tg.expand();
+
+        // Данные пользователя
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('user-id').innerText = user.id;
+            document.getElementById('user-name').innerText = "@" + user.username;
         }
 
-        // --- Настройка синей кнопки внизу ---
-        tg.MainButton.text = "Открыть VPN и подключить"; // Текст на кнопке
-        tg.MainButton.color = "#2481cc"; // Синий цвет
-        tg.MainButton.textColor = "#ffffff"; // Белый текст
-        tg.MainButton.show(); // Показать кнопку
+        // Переключение вкладок
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('tab-active');
+        }
 
-        // --- Действие при нажатии на нижнюю кнопку ---
-        tg.MainButton.onClick(function() {
-            // Ссылка подписки, которую ты прислал
-            const vpnUrl = 'v2raytun://install-config?url=http://77.91.84.106:2096/sub/ego95km8cmaejnni';
-            
-            // Открываем приложение
-            tg.openLink(vpnUrl);
-        });
+        // Копирование ссылки
+        function copyLink() {
+            const vlessLink = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
+            navigator.clipboard.writeText(vlessLink);
+            tg.showAlert("Ссылка скопирована!");
+        }
     </script>
 </body>
 </html>
