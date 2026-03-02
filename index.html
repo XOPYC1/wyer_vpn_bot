@@ -106,7 +106,6 @@
         }
 
         // --- ЛОГИКА ДАННЫХ ---
-        // В реальном приложении тут должен быть fetch данных с сервера
         const balance = 0; 
         document.getElementById('user-balance').innerText = balance + "$";
         
@@ -143,8 +142,11 @@
 
         function buySubscription() {
             const days = document.getElementById("tariff-select").value;
+            // Отправляем данные на сервер
             tg.sendData(JSON.stringify({action: "buy_sub", user_id: user.id, days: days}));
-            tg.close();
+            
+            // ВАЖНО: Не закрываем окно, чтобы пользователь дождался ссылки в чате
+            tg.showAlert("Перехожу к оплате в чате...");
         }
     </script>
 </body>
