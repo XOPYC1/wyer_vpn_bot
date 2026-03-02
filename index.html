@@ -13,7 +13,7 @@
         .tab-active { border-bottom: 2px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); font-weight: bold; }
         
         /* Стилизация поле ввода под тему */
-        textarea { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: 1px solid rgba(0,0,0,0.1); }
+        textarea, select { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: 1px solid rgba(0,0,0,0.1); }
         
         /* УБИРАЕМ ПОЛЯ QR */
         #qrcode img { margin: 0 auto; display: block; }
@@ -67,7 +67,18 @@
             
             <p class="font-bold">Ссылка VLESS:</p>
             <textarea id="vless-link" class="w-full p-3 rounded-lg text-xs h-24" readonly></textarea>
-            <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Скопировать ссылку</button>
+            
+            <p class="font-bold mt-2">Выберите тариф:</p>
+            <select id="tariff-select" class="w-full p-3 rounded-lg font-bold">
+                <option value="7">7 дней - 0.5$</option>
+                <option value="30">1 месяц - 1.5$</option>
+                <option value="90">3 месяца - 4$</option>
+                <option value="180">6 месяцев - 7$</option>
+                <option value="365">1 год - 12$</option>
+            </select>
+            
+            <button onclick="copyLink()" class="w-full bg-gray-600 text-white p-3 rounded-lg font-bold">Скопировать ссылку</button>
+            <button onclick="buySubscription()" class="w-full bg-green-600 text-white p-3 rounded-lg font-bold">💎 Оплатить</button>
         </div>
     </div>
 
@@ -87,7 +98,6 @@
             document.getElementById('user-id').innerText = user.id;
             document.getElementById('user-name').innerText = "@" + user.username;
             
-            // Загрузка реального фото
             if (user.photo_url) {
                 const avatarImg = document.getElementById('user-avatar');
                 const placeholder = document.getElementById('avatar-placeholder');
@@ -109,7 +119,6 @@
         document.getElementById('sub-date').innerText = "20.03.2026";
         document.getElementById('vless-link').value = vlessLink;
 
-        // --- ГЕНЕРАЦИЯ QR-КОДА БЕЗ ПОЛЕЙ ---
         new QRCode(document.getElementById("qrcode"), {
             text: vlessLink,
             width: 170,
@@ -131,6 +140,13 @@
             copyText.select();
             document.execCommand("copy");
             tg.showAlert("Ссылка скопирована!");
+        }
+
+        // --- ФУНКЦИЯ ПОКУПКИ С ВЫБОРОМ ТАРИФА ---
+        function buySubscription() {
+            const days = document.getElementById("tariff-select").value;
+            tg.sendData(JSON.stringify({action: "buy_sub", user_id: user.id, days: days}));
+            tg.showAlert("Перенаправляю на оплату...");
         }
     </script>
 </body>
