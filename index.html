@@ -29,18 +29,10 @@
             font-weight: bold; 
         }
         
-        /* Стандартные кнопки темы */
+        /* Стилизация всех кнопок под тему */
         .button-theme { 
             background-color: var(--tg-theme-button-color);
             color: var(--tg-theme-button-text-color);
-            border-radius: 9999px; 
-            transition: all 0.2s ease; 
-        }
-
-        /* Кнопка ОПЛАТИТЬ - ГОЛУБАЯ */
-        .button-pay { 
-            background-color: #3b82f6; /* blue-500 */
-            color: white;
             border-radius: 9999px; 
             transition: all 0.2s ease; 
         }
@@ -129,7 +121,7 @@
                 </select>
             </div>
             
-            <button onclick="buySubscription()" class="button-pay w-full p-5 font-extrabold text-lg shadow-lg">
+            <button onclick="buySubscription()" class="button-theme w-full p-5 font-extrabold text-lg shadow-lg">
                 💎 Оплатить
             </button>
         </div>
@@ -184,12 +176,8 @@
 
         function buySubscription() {
             const days = document.getElementById("tariff-select").value;
-            // Отправляем данные
             tg.sendData(JSON.stringify({action: "buy_sub", days: days}));
-            
             tg.showAlert("Обрабатываю заказ, перехожу к оплате в чате...");
-            
-            // ЗАКРЫВАЕМ ОКНО
             tg.close();
         }
     </script>
