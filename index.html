@@ -11,7 +11,12 @@
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
         .card { background-color: var(--tg-theme-secondary-bg-color); border: 1px solid rgba(0,0,0,0.1); }
         .tab-active { border-bottom: 2px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); font-weight: bold; }
-        #qrcode img { width: 100%; height: auto; } /* QR растягивается по контейнеру */
+        
+        /* Стилизация поле ввода под тему */
+        textarea { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: 1px solid rgba(0,0,0,0.1); }
+        
+        /* Подгонка размера QR кода */
+        #qrcode img { margin: 0 auto; }
     </style>
 </head>
 <body class="p-4 font-sans text-sm">
@@ -29,7 +34,9 @@
     <div id="profile" class="tab-content space-y-4">
         <div class="card p-5 rounded-2xl shadow-lg space-y-3">
             <div class="flex items-center gap-3">
-                <div class="bg-gray-300 rounded-full w-12 h-12 flex items-center justify-center text-xl">👤</div>
+                <img id="user-avatar" src="" class="rounded-full w-14 h-14 border-2 border-blue-400 hidden" alt="Avatar">
+                <div id="avatar-placeholder" class="rounded-full w-14 h-14 border-2 border-blue-400 flex items-center justify-center text-xl bg-gray-300">👤</div>
+                
                 <div>
                     <p class="text-lg font-bold" id="user-name">@username</p>
                     <p class="text-xs opacity-70">ID: <span id="user-id">000000</span></p>
@@ -54,12 +61,12 @@
         <div class="card p-4 rounded-xl shadow-md space-y-3">
             <p><strong>Активна до:</strong> <span id="sub-date" class="text-blue-500 font-bold">...</span></p>
             
-            <div class="bg-white p-2 rounded-lg flex justify-center items-center">
-                <div id="qrcode" style="width:180px; height:180px;"></div>
+            <div class="flex justify-center items-center">
+                <div id="qrcode" class="bg-white p-2 rounded-lg"></div>
             </div>
             
             <p class="font-bold">Ссылка VLESS:</p>
-            <textarea id="vless-link" class="w-full p-3 rounded bg-white text-black text-xs h-24" readonly></textarea>
+            <textarea id="vless-link" class="w-full p-3 rounded-lg text-xs h-24" readonly></textarea>
             <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Скопировать ссылку</button>
         </div>
     </div>
@@ -79,16 +86,22 @@
         if (user) {
             document.getElementById('user-id').innerText = user.id;
             document.getElementById('user-name').innerText = "@" + user.username;
+            
+            // Загрузка реального фото
+            if (user.photo_url) {
+                const avatarImg = document.getElementById('user-avatar');
+                const placeholder = document.getElementById('avatar-placeholder');
+                avatarImg.src = user.photo_url;
+                avatarImg.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            }
         }
 
         // --- ЛОГИКА ---
-        const balance = 0; // Начнем с 0 для проверки 0 уровня
+        const balance = 0; 
         document.getElementById('user-balance').innerText = balance + "$";
-        
-        // Уровень 0 при балансе 0, +1 каждые 5$
         const level = Math.floor(balance / 5); 
         const discount = level * 1; 
-        
         document.getElementById('user-lvl').innerText = level;
         document.getElementById('user-discount').innerText = discount + "%";
 
@@ -99,8 +112,8 @@
         // --- ГЕНЕРАЦИЯ QR-КОДА ---
         new QRCode(document.getElementById("qrcode"), {
             text: vlessLink,
-            width: 180,
-            height: 180,
+            width: 170,
+            height: 170,
             colorDark : "#000000",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
