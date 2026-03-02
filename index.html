@@ -28,19 +28,17 @@
         <div class="card p-4 rounded-xl shadow-md">
             <p><strong>ID:</strong> <span id="user-id"></span></p>
             <p><strong>Ник:</strong> <span id="user-name"></span></p>
+            <p><strong>Баланс:</strong> <span id="user-balance">0</span>$</p>
             <p><strong>Уровень:</strong> <span id="user-lvl">1</span> (<span id="user-discount">0</span>% скидка)</p>
         </div>
     </div>
 
     <div id="subscription" class="tab-content space-y-4 hidden">
         <div class="card p-4 rounded-xl shadow-md space-y-3">
-            <p><strong>Действует до:</strong> <span id="sub-date">31.12.2026</span></p>
-            <p class="font-bold">Инструкция:</p>
-            <p class="text-xs opacity-80">1. Скопируйте ссылку. 2. Откройте V2Raytun. 3. Нажмите "+" -> "Import from Clipboard".</p>
-            <div class="bg-white p-2 rounded-lg text-center">
-                <p class="text-gray-500">[QR КОД]</p>
-            </div>
-            <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold">Скопировать VLESS</button>
+            <p><strong>Действует до:</strong> <span id="sub-date">...</span></p>
+            <p class="font-bold">Ссылка VLESS:</p>
+            <input type="text" id="vless-link" class="w-full p-2 rounded bg-white text-black" value="vless://..." readonly>
+            <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold">Скопировать ссылку</button>
         </div>
     </div>
 
@@ -55,12 +53,27 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Данные пользователя
+        // 1. Данные пользователя из Telegram
         const user = tg.initDataUnsafe?.user;
         if (user) {
             document.getElementById('user-id').innerText = user.id;
             document.getElementById('user-name').innerText = "@" + user.username;
         }
+
+        // 2. РАСЧЕТ УРОВНЯ И СКИДКИ (Логика)
+        // Для примера ставим баланс 12$, но потом его нужно брать из базы
+        const balance = 12; 
+        document.getElementById('user-balance').innerText = balance;
+        
+        const level = Math.floor(balance / 5) + 1; // Уровень каждые 5$
+        const discount = (level - 1) * 1; // 1% за уровень
+        
+        document.getElementById('user-lvl').innerText = level;
+        document.getElementById('user-discount').innerText = discount;
+
+        // 3. Данные подписки (временно статика)
+        document.getElementById('sub-date').innerText = "20.03.2026";
+        document.getElementById('vless-link').value = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
 
         // Переключение вкладок
         function showTab(tabId) {
@@ -72,7 +85,7 @@
 
         // Копирование ссылки
         function copyLink() {
-            const vlessLink = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
+            const vlessLink = document.getElementById('vless-link').value;
             navigator.clipboard.writeText(vlessLink);
             tg.showAlert("Ссылка скопирована!");
         }
