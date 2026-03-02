@@ -9,14 +9,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .card { background-color: var(--tg-theme-secondary-bg-color); }
-        .tab-active { border-bottom: 2px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); }
+        .card { background-color: var(--tg-theme-secondary-bg-color); border: 1px solid rgba(0,0,0,0.1); }
+        .tab-active { border-bottom: 2px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); font-weight: bold; }
+        #qrcode img { width: 100%; height: auto; } /* QR растягивается по контейнеру */
     </style>
 </head>
 <body class="p-4 font-sans text-sm">
 
     <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold">Wyer VPN</h1>
+        <h1 class="text-3xl font-extrabold text-blue-500">Wyer VPN</h1>
     </div>
 
     <div class="flex justify-around mb-6 border-b border-gray-300">
@@ -26,25 +27,40 @@
     </div>
 
     <div id="profile" class="tab-content space-y-4">
-        <div class="card p-4 rounded-xl shadow-md">
-            <p><strong>ID:</strong> <span id="user-id"></span></p>
-            <p><strong>Ник:</strong> <span id="user-name"></span></p>
-            <p><strong>Баланс:</strong> <span id="user-balance">0</span>$</p>
-            <p><strong>Уровень:</strong> <span id="user-lvl">1</span> (<span id="user-discount">0</span>% скидка)</p>
+        <div class="card p-5 rounded-2xl shadow-lg space-y-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-gray-300 rounded-full w-12 h-12 flex items-center justify-center text-xl">👤</div>
+                <div>
+                    <p class="text-lg font-bold" id="user-name">@username</p>
+                    <p class="text-xs opacity-70">ID: <span id="user-id">000000</span></p>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-3 flex justify-between">
+                <span>Баланс:</span>
+                <span class="font-bold text-lg text-green-500" id="user-balance">0$</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Уровень:</span>
+                <span class="font-bold" id="user-lvl">0</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Скидка:</span>
+                <span class="font-bold" id="user-discount">0%</span>
+            </div>
         </div>
     </div>
 
     <div id="subscription" class="tab-content space-y-4 hidden">
         <div class="card p-4 rounded-xl shadow-md space-y-3">
-            <p><strong>Действует до:</strong> <span id="sub-date">...</span></p>
+            <p><strong>Активна до:</strong> <span id="sub-date" class="text-blue-500 font-bold">...</span></p>
             
-            <div class="bg-white p-2 rounded-lg text-center flex justify-center">
-                <div id="qrcode"></div>
+            <div class="bg-white p-2 rounded-lg flex justify-center items-center">
+                <div id="qrcode" style="width:180px; height:180px;"></div>
             </div>
             
             <p class="font-bold">Ссылка VLESS:</p>
-            <input type="text" id="vless-link" class="w-full p-2 rounded bg-white text-black" value="vless://..." readonly>
-            <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold">Скопировать ссылку</button>
+            <textarea id="vless-link" class="w-full p-3 rounded bg-white text-black text-xs h-24" readonly></textarea>
+            <button onclick="copyLink()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Скопировать ссылку</button>
         </div>
     </div>
 
@@ -66,12 +82,15 @@
         }
 
         // --- ЛОГИКА ---
-        const balance = 12; // Временный баланс
-        document.getElementById('user-balance').innerText = balance;
-        const level = Math.floor(balance / 5) + 1;
-        const discount = (level - 1) * 1;
+        const balance = 0; // Начнем с 0 для проверки 0 уровня
+        document.getElementById('user-balance').innerText = balance + "$";
+        
+        // Уровень 0 при балансе 0, +1 каждые 5$
+        const level = Math.floor(balance / 5); 
+        const discount = level * 1; 
+        
         document.getElementById('user-lvl').innerText = level;
-        document.getElementById('user-discount').innerText = discount;
+        document.getElementById('user-discount').innerText = discount + "%";
 
         const vlessLink = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
         document.getElementById('sub-date').innerText = "20.03.2026";
@@ -80,8 +99,11 @@
         // --- ГЕНЕРАЦИЯ QR-КОДА ---
         new QRCode(document.getElementById("qrcode"), {
             text: vlessLink,
-            width: 150,
-            height: 150,
+            width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
         });
 
         function showTab(tabId) {
@@ -92,7 +114,9 @@
         }
 
         function copyLink() {
-            navigator.clipboard.writeText(vlessLink);
+            const copyText = document.getElementById("vless-link");
+            copyText.select();
+            document.execCommand("copy");
             tg.showAlert("Ссылка скопирована!");
         }
     </script>
