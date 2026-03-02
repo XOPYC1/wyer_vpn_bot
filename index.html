@@ -26,7 +26,7 @@
 
     <div class="flex justify-around mb-6 border-b border-gray-200 text-xs">
         <button onclick="showTab('profile')" class="tab-button tab-active p-4 flex-1 text-center" id="btn-profile">👤 Профиль</button>
-        <button onclick="showTab('subscription')" class="tab-button p-4 flex-1 text-center" id="btn-subscription">💎 Моя</button>
+        <button onclick="showTab('subscription')" class="tab-button p-4 flex-1 text-center" id="btn-subscription">💎 Моя подписка</button>
         <button onclick="showTab('buy')" class="tab-button p-4 flex-1 text-center" id="btn-buy">🛒 Купить</button>
         <button onclick="showTab('support')" class="tab-button p-4 flex-1 text-center" id="btn-support">💬 Help</button>
     </div>
@@ -45,10 +45,6 @@
                 <div class="flex justify-between items-center p-3 rounded-xl stat-item">
                     <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Баланс:</span>
                     <span class="font-bold text-xl text-green-600" id="user-balance">0$</span>
-                </div>
-                <div class="flex justify-between items-center p-3 rounded-xl stat-item">
-                    <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Уровень:</span>
-                    <span class="font-bold text-lg" style="color: var(--tg-theme-text-color)" id="user-lvl">0</span>
                 </div>
             </div>
         </div>
@@ -110,8 +106,7 @@
         tg.expand();
         const user = tg.initDataUnsafe?.user;
 
-        // --- ЛОГИКА ПОДПИСКИ (ИСПРАВЛЕНО) ---
-        let hasSubscription = true; // ТУТ ТВОЯ ЛОГИКА ИЗ БАЗЫ
+        let hasSubscription = true; // ТУТ ЛОГИКА ИЗ БАЗЫ
         
         const subDateEl = document.getElementById('sub-date');
         const qrContainer = document.getElementById('qr-container');
@@ -127,12 +122,11 @@
                 subDateEl.innerText = "20.03.2026";
                 vlessArea.value = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
                 qrContainer.classList.remove('hidden');
-                qrCodeEl.innerHTML = ""; // Очистить старый QR
+                qrCodeEl.innerHTML = "";
                 new QRCode(qrCodeEl, { text: vlessArea.value, width: 170, height: 170, correctLevel: QRCode.CorrectLevel.H });
             }
         }
         updateSubscriptionUI();
-        // ------------------------------------
 
         if (user) {
             document.getElementById('user-id').innerText = user.id;
@@ -165,35 +159,37 @@
             toggleAccordion();
         }
 
+        // --- ЛОГИКА ОПЛАТЫ (ИСПРАВЛЕНО) ---
         function buySubscription() {
             if (!selectedTariffDays) {
                 tg.showAlert("Пожалуйста, выберите тариф");
                 return;
             }
+            // Отправляем данные боту
             tg.sendData(JSON.stringify({action: "buy_sub", days: selectedTariffDays}));
-            tg.close();
+            
+            // Ждем немного и закрываем, чтобы данные успели уйти
+            setTimeout(() => {
+                tg.close();
+            }, 500);
         }
+        // ----------------------------------
 
-        // --- ЛОГИКА УДАЛЕНИЯ (ИСПРАВЛЕНО) ---
         function deleteSubscription() {
             if(!hasSubscription) {
                 tg.showAlert("У вас нет активной подписки");
                 return;
             }
             
-            tg.showConfirm("Вы уверены, что хотите удалить подписку? Это действие нельзя отменить.", (success) => {
+            tg.showConfirm("Вы уверены, что хотите удалить подписку?", (success) => {
                 if(success) {
-                    // Отправляем запрос боту на удаление
                     tg.sendData(JSON.stringify({action: "delete_sub"}));
-                    
-                    // Локально обновляем UI (до ответа бота)
                     hasSubscription = false;
                     updateSubscriptionUI();
                     tg.showAlert("Подписка удалена");
                 }
             });
         }
-        // ------------------------------------
     </script>
 </body>
 </html>
