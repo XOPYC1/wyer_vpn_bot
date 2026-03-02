@@ -4,51 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wyer VPN - Профиль</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .card { background-color: var(--tg-theme-secondary-bg-color); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .active-btn { border-bottom: 2px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); }
+        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); text-align: center; padding: 20px; }
+        #qrcode { margin: 20px auto; display: flex; justify-content: center; }
+        .key-text { word-break: break-all; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; font-size: 12px; margin-top: 10px; }
+        .status-active { color: green; font-weight: bold; }
+        .status-expired { color: red; font-weight: bold; }
     </style>
 </head>
-<body class="p-4">
-    <h1 class="text-2xl font-bold text-center mb-6">💎 Моя подписка</h1>
+<body>
+    <h1>💎 Моя подписка</h1>
+    <p>Статус: <span id="status">Загрузка...</span></p>
+    <p>Действует до: <span id="expires">...</span></p>
     
-    <div class="card p-5 rounded-2xl mb-6 text-center">
-        <p class="text-sm opacity-70">Статус</p>
-        <p class="font-bold text-lg text-green-500" id="sub-status">Активна</p>
-        <p class="text-xs opacity-50 mt-2" id="sub-expires">Истекает: 01.01.2025</p>
-    </div>
-
-    <h2 class="text-xl font-bold text-center mb-4">📖 Инструкции</h2>
-    <div class="flex justify-around border-b mb-4 text-sm font-bold">
-        <button onclick="showTab('android')" class="tab-btn active-btn pb-2" id="btn-android">Android</button>
-        <button onclick="showTab('ios')" class="tab-btn pb-2" id="btn-ios">iOS</button>
-        <button onclick="showTab('win')" class="tab-btn pb-2" id="btn-win">Win</button>
-    </div>
-
-    <div id="tab-android" class="tab-content active card p-4 rounded-xl text-sm space-y-2">
-        <p>1. Установите <b>V2rayTUN</b>.</p>
-        <p>2. Скопируйте ключ из бота.</p>
-    </div>
+    <div id="qrcode"></div>
+    <div class="key-text" id="key">Загрузка ключа...</div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+
+        // 1. Получаем ID пользователя из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('uid');
+
+        // 2. !!! ЗАГЛУШКА !!!
+        // В реальной жизни тут нужен fetch('/api/user_info?id=' + userId)
+        // Но пока что мы просто показываем, что QR генерируется тут.
+        const vlessLink = "vless://ВАШ-UUID-ИЗ-БАЗЫ@77.91.84.106:443?security=reality&sni=www.apple.com&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=yrhww5KokWmb-NHQoyV6G44OfBly5Q2BVxw5ZJ3CqD4&sid=a7#WyerVPN";
+        const subExpires = "31.12.2025";
+        const isActive = true;
+
+        // 3. Отображение данных
+        document.getElementById('key').innerText = vlessLink;
+        document.getElementById('status').innerText = isActive ? "Активна" : "Истекла";
+        document.getElementById('status').className = isActive ? "status-active" : "status-expired";
+        document.getElementById('expires').innerText = subExpires;
+
+        // 4. Генерация QR-кода прямо в браузере телефона
+        QRCode.toCanvas(document.getElementById('qrcode'), vlessLink, { width: 200, margin: 1 });
         
-        // ВАЖНО: Тут логика получения данных подписки из бота (через API)
-        // Пока заглушка
-        document.getElementById('sub-status').innerText = "Активна";
-        
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-btn'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('btn-' + tabId).classList.add('active-btn');
-        }
     </script>
 </body>
 </html>
