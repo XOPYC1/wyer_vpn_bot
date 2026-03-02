@@ -3,62 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyer VPN - Профиль</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); text-align: center; padding: 20px; }
-        #qrcode { margin: 20px auto; display: flex; justify-content: center; }
-        .key-text { word-break: break-all; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; font-size: 12px; margin-top: 10px; }
-        .status-active { color: #51c470; font-weight: bold; }
-        .status-expired { color: #f26456; font-weight: bold; }
-        .loader { font-style: italic; color: gray; }
-    </style>
+    <title>Wyer VPN</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>💎 Моя подписка</h1>
-    
-    <div id="data-container">
-        <p>Статус: <span id="status" class="loader">Загрузка...</span></p>
-        <p>Действует до: <span id="expires" class="loader">...</span></p>
-        
-        <canvas id="qrcode"></canvas>
-        <div class="key-text" id="key">Загрузка ключа...</div>
-    </div>
+
+    <header>
+        <div class="burger-menu" onclick="toggleMenu()">
+            &#9776; </div>
+        <div class="logo">Wyer VPN</div>
+    </header>
+
+    <nav id="sidebar" class="sidebar">
+        <a href="#" onclick="showSection('buy')">Купить подписку</a>
+        <a href="#" onclick="showSection('account')">Аккаунт</a>
+        <a href="#" onclick="showSection('subscription')">Моя подписка</a>
+        <a href="#" onclick="showSection('contacts')">Контакты</a>
+    </nav>
+
+    <main>
+        <section id="buy" class="content-section active">
+            <h1>Купить подписку</h1>
+            <div class="tariffs">
+                <div class="tariff-card">1 месяц - 1.5$</div>
+                <div class="tariff-card">3 месяца - 4$</div>
+                <div class="tariff-card">6 месяцев - 7$</div>
+                <div class="tariff-card">1 год - 12$</div>
+            </div>
+        </section>
+
+        <section id="account" class="content-section">
+            <h1>Аккаунт</h1>
+            <p>Логин: user@example.com</p>
+            <p>Ник: Пользователь</p>
+        </section>
+
+        <section id="subscription" class="content-section">
+            <h1>Моя подписка</h1>
+            <p>Срок действия: активна</p>
+            <p>Заканчивается: 01.01.2027</p>
+            <div class="qr-code"> [Здесь будет QR-код] </div>
+            <div class="vless-key">vless://...ключ...</div>
+        </section>
+
+        <section id="contacts" class="content-section">
+            <h1>Контакты</h1>
+            <p>Почта: <a href="mailto:wyer.sup@gmail.com">wyer.sup@gmail.com</a></p>
+            <p>TG Поддержка: <a href="https://t.me/WyerVPNsupportBot">@WyerVPNsupportBot</a></p>
+        </section>
+    </main>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // Функция для открытия/закрытия меню
+        function toggleMenu() {
+            document.getElementById("sidebar").classList.toggle("open");
+        }
 
-        // 1. Получаем ID пользователя из URL, переданного ботом
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('uid');
-
-        // URL вашего бэкенда, который возвращает данные пользователя
-        const API_URL = 'https://ВАШ-API-URL.vercel.app/api/user-data?id=' + userId;
-
-        if (userId) {
-            // 2. Запрос реальных данных
-            fetch(API_URL)
-                .then(response => response.json())
-                .then(data => {
-                    // Отображение данных из базы
-                    document.getElementById('key').innerText = data.vlessLink;
-                    document.getElementById('status').innerText = data.isActive ? "Активна" : "Истекла";
-                    document.getElementById('status').className = data.isActive ? "status-active" : "status-expired";
-                    document.getElementById('expires').innerText = data.subExpires;
-                    document.getElementById('status').classList.remove('loader');
-                    document.getElementById('expires').classList.remove('loader');
-
-                    // 3. Генерация QR-кода
-                    QRCode.toCanvas(document.getElementById('qrcode'), data.vlessLink, { width: 200, margin: 1 });
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                    document.getElementById('status').innerText = "Ошибка загрузки";
-                });
-        } else {
-            document.getElementById('status').innerText = "Ошибка: ID не найден";
+        // Функция для переключения разделов
+        function showSection(sectionId) {
+            // Скрыть все секции
+            let sections = document.querySelectorAll('.content-section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            
+            // Показать нужную
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Закрыть меню
+            document.getElementById("sidebar").classList.remove("open");
         }
     </script>
 </body>
