@@ -8,57 +8,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* Использование системных цветов Telegram */
-        body { 
-            background-color: var(--tg-theme-bg-color); 
-            color: var(--tg-theme-text-color); 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        /* Карточки с фоном из темы - ИСПРАВЛЕНО (Фон темы) */
-        .card { 
-            background-color: var(--tg-theme-secondary-bg-color); 
-            border-radius: 24px; 
-            border: 1px solid rgba(0,0,0,0.05); 
-        }
-        
-        /* Активная вкладка */
-        .tab-active { 
-            border-bottom: 3px solid var(--tg-theme-button-color); 
-            color: var(--tg-theme-button-color); 
-            font-weight: bold; 
-        }
-        
-        /* Кнопки - ИСПРАВЛЕНО (Фон темы) */
-        .button-theme { 
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border-radius: 9999px; 
-            transition: all 0.2s ease; 
-        }
-
-        /* Выпадающий список (Аккордеон) - ИСПРАВЛЕНО (Фон темы) */
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            background-color: var(--tg-theme-secondary-bg-color);
-        }
-        
-        /* Поля ввода - ИСПРАВЛЕНО (Фон темы) */
-        textarea { 
-            background-color: var(--tg-theme-bg-color); 
-            color: var(--tg-theme-text-color); 
-            border-radius: 16px; 
-            border: 1px solid rgba(0,0,0,0.1); 
-        }
-        
-        /* Элементы статистики - ИСПРАВЛЕНО (Фон темы) */
-        .stat-item {
-            background-color: var(--tg-theme-bg-color);
-        }
-        
-        /* QR-код */
+        body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        .card { background-color: var(--tg-theme-secondary-bg-color); border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); }
+        .tab-active { border-bottom: 3px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); font-weight: bold; }
+        .button-theme { background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); border-radius: 9999px; transition: all 0.2s ease; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background-color: var(--tg-theme-bg-color); }
+        textarea { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border-radius: 16px; border: 1px solid rgba(0,0,0,0.1); }
+        .stat-item { background-color: var(--tg-theme-bg-color); }
         #qrcode img { margin: 0 auto; display: block; }
     </style>
 </head>
@@ -68,10 +24,11 @@
         <h1 class="text-4xl font-extrabold text-blue-500 tracking-tighter">Wyer VPN</h1>
     </div>
 
-    <div class="flex justify-around mb-6 border-b border-gray-200">
+    <div class="flex justify-around mb-6 border-b border-gray-200 text-xs">
         <button onclick="showTab('profile')" class="tab-button tab-active p-4 flex-1 text-center" id="btn-profile">👤 Профиль</button>
-        <button onclick="showTab('subscription')" class="tab-button p-4 flex-1 text-center" id="btn-subscription">💎 Подписка</button>
-        <button onclick="showTab('support')" class="tab-button p-4 flex-1 text-center" id="btn-support">💬 Support</button>
+        <button onclick="showTab('subscription')" class="tab-button p-4 flex-1 text-center" id="btn-subscription">💎 Моя</button>
+        <button onclick="showTab('buy')" class="tab-button p-4 flex-1 text-center" id="btn-buy">🛒 Купить</button>
+        <button onclick="showTab('support')" class="tab-button p-4 flex-1 text-center" id="btn-support">💬 Help</button>
     </div>
 
     <div id="profile" class="tab-content space-y-4">
@@ -84,7 +41,6 @@
                     <p class="text-xs opacity-60">ID: <span id="user-id">000000</span></p>
                 </div>
             </div>
-            
             <div class="border-t border-gray-100 pt-4 space-y-3">
                 <div class="flex justify-between items-center p-3 rounded-xl stat-item">
                     <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Баланс:</span>
@@ -94,21 +50,17 @@
                     <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Уровень:</span>
                     <span class="font-bold text-lg" style="color: var(--tg-theme-text-color)" id="user-lvl">0</span>
                 </div>
-                <div class="flex justify-between items-center p-3 rounded-xl stat-item">
-                    <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Скидка:</span>
-                    <span class="font-bold text-lg text-blue-500" id="user-discount">0%</span>
-                </div>
             </div>
         </div>
     </div>
 
     <div id="subscription" class="tab-content space-y-4 hidden">
         <div class="card p-5 space-y-4">
-            <div class="text-center p-3 rounded-xl" style="background-color: var(--tg-theme-bg-color)">
-                <p class="text-sm" style="color: var(--tg-theme-text-color)">Активна до: <span id="sub-date" class="font-bold" style="color: var(--tg-theme-button-color)">20.03.2026</span></p>
+            <div class="text-center p-3 rounded-xl stat-item">
+                <p class="text-sm" style="color: var(--tg-theme-text-color)">Активна до: <span id="sub-date" class="font-bold" style="color: var(--tg-theme-button-color)">Нет подписки</span></p>
             </div>
             
-            <div class="flex justify-center items-center bg-white p-4 rounded-3xl shadow-inner">
+            <div id="qr-container" class="flex justify-center items-center bg-white p-4 rounded-3xl shadow-inner hidden">
                 <div id="qrcode"></div>
             </div>
             
@@ -117,9 +69,17 @@
                 <textarea id="vless-link" class="w-full p-4 text-xs h-20" readonly></textarea>
             </div>
             
+            <button onclick="deleteSubscription()" class="w-full p-4 font-bold text-sm bg-red-100 text-red-600 rounded-full hover:bg-red-200">
+                🗑️ Удалить подписку
+            </button>
+        </div>
+    </div>
+
+    <div id="buy" class="tab-content space-y-4 hidden">
+        <div class="card p-5 space-y-4">
             <div class="space-y-2">
                 <label class="block mb-2 font-bold opacity-80" style="color: var(--tg-theme-text-color)">Выберите тариф:</label>
-                <button onclick="toggleAccordion()" class="w-full text-left p-4 rounded-xl flex justify-between items-center" style="background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color)">
+                <button onclick="toggleAccordion()" class="w-full text-left p-4 rounded-xl flex justify-between items-center stat-item" style="color: var(--tg-theme-text-color)">
                     <span id="selected-tariff">Выберите...</span>
                     <span>▼</span>
                 </button>
@@ -130,7 +90,6 @@
                     <button onclick="selectTariff('365', '1 год - 12$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">1 год - 12$</button>
                 </div>
             </div>
-            
             <button onclick="buySubscription()" class="button-theme w-full p-5 font-extrabold text-lg shadow-lg">
                 💎 Оплатить
             </button>
@@ -140,7 +99,6 @@
     <div id="support" class="tab-content hidden">
         <div class="card p-6 text-center space-y-4">
             <h2 class="text-2xl font-bold" style="color: var(--tg-theme-text-color)">Техническая поддержка</h2>
-            <p class="opacity-70" style="color: var(--tg-theme-text-color)">Возникли проблемы? Напишите нам, мы ответим в течение 15 минут.</p>
             <a href="https://t.me/WyerVPNsupportBot" class="button-theme inline-block w-full p-4 font-bold text-base shadow-md">
                 💬 Написать боту
             </a>
@@ -151,6 +109,30 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         const user = tg.initDataUnsafe?.user;
+
+        // --- ЛОГИКА ПОДПИСКИ (ИСПРАВЛЕНО) ---
+        let hasSubscription = true; // ТУТ ТВОЯ ЛОГИКА ИЗ БАЗЫ
+        
+        const subDateEl = document.getElementById('sub-date');
+        const qrContainer = document.getElementById('qr-container');
+        const vlessArea = document.getElementById('vless-link');
+        const qrCodeEl = document.getElementById("qrcode");
+
+        function updateSubscriptionUI() {
+            if (!hasSubscription) {
+                subDateEl.innerText = "Нет активной подписки";
+                vlessArea.value = "Сначала купите подписку в разделе 'Купить'!";
+                qrContainer.classList.add('hidden');
+            } else {
+                subDateEl.innerText = "20.03.2026";
+                vlessArea.value = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
+                qrContainer.classList.remove('hidden');
+                qrCodeEl.innerHTML = ""; // Очистить старый QR
+                new QRCode(qrCodeEl, { text: vlessArea.value, width: 170, height: 170, correctLevel: QRCode.CorrectLevel.H });
+            }
+        }
+        updateSubscriptionUI();
+        // ------------------------------------
 
         if (user) {
             document.getElementById('user-id').innerText = user.id;
@@ -164,20 +146,6 @@
             }
         }
 
-        const balance = 0; 
-        document.getElementById('user-balance').innerText = balance + "$";
-        const level = Math.floor(balance / 5); 
-        document.getElementById('user-lvl').innerText = level;
-        document.getElementById('user-discount').innerText = (level * 1) + "%";
-
-        const vlessLink = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
-        document.getElementById('vless-link').value = vlessLink;
-
-        new QRCode(document.getElementById("qrcode"), {
-            text: vlessLink, width: 170, height: 170, correctLevel: QRCode.CorrectLevel.H
-        });
-
-        // Логика переключения вкладок
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
@@ -185,7 +153,6 @@
             document.getElementById('btn-' + tabId).classList.add('tab-active');
         }
 
-        // Логика аккордеона
         let selectedTariffDays = null;
         function toggleAccordion() {
             const accordion = document.getElementById('accordion');
@@ -195,7 +162,7 @@
         function selectTariff(days, text) {
             selectedTariffDays = days;
             document.getElementById('selected-tariff').innerText = text;
-            toggleAccordion(); // Закрыть после выбора
+            toggleAccordion();
         }
 
         function buySubscription() {
@@ -204,9 +171,29 @@
                 return;
             }
             tg.sendData(JSON.stringify({action: "buy_sub", days: selectedTariffDays}));
-            tg.showAlert("Обрабатываю заказ, перехожу к оплате в чате...");
             tg.close();
         }
+
+        // --- ЛОГИКА УДАЛЕНИЯ (ИСПРАВЛЕНО) ---
+        function deleteSubscription() {
+            if(!hasSubscription) {
+                tg.showAlert("У вас нет активной подписки");
+                return;
+            }
+            
+            tg.showConfirm("Вы уверены, что хотите удалить подписку? Это действие нельзя отменить.", (success) => {
+                if(success) {
+                    // Отправляем запрос боту на удаление
+                    tg.sendData(JSON.stringify({action: "delete_sub"}));
+                    
+                    // Локально обновляем UI (до ответа бота)
+                    hasSubscription = false;
+                    updateSubscriptionUI();
+                    tg.showAlert("Подписка удалена");
+                }
+            });
+        }
+        // ------------------------------------
     </script>
 </body>
 </html>
