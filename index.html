@@ -15,7 +15,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
         
-        /* Карточки с фоном из темы */
+        /* Карточки с фоном из темы - ИСПРАВЛЕНО (Фон темы) */
         .card { 
             background-color: var(--tg-theme-secondary-bg-color); 
             border-radius: 24px; 
@@ -29,7 +29,7 @@
             font-weight: bold; 
         }
         
-        /* Кнопки */
+        /* Кнопки - ИСПРАВЛЕНО (Фон темы) */
         .button-theme { 
             background-color: var(--tg-theme-button-color);
             color: var(--tg-theme-button-text-color);
@@ -37,19 +37,25 @@
             transition: all 0.2s ease; 
         }
 
-        /* Выпадающий список (Аккордеон) */
+        /* Выпадающий список (Аккордеон) - ИСПРАВЛЕНО (Фон темы) */
         .accordion-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
+            background-color: var(--tg-theme-secondary-bg-color);
         }
         
-        /* Поля ввода */
+        /* Поля ввода - ИСПРАВЛЕНО (Фон темы) */
         textarea { 
             background-color: var(--tg-theme-bg-color); 
             color: var(--tg-theme-text-color); 
             border-radius: 16px; 
             border: 1px solid rgba(0,0,0,0.1); 
+        }
+        
+        /* Элементы статистики - ИСПРАВЛЕНО (Фон темы) */
+        .stat-item {
+            background-color: var(--tg-theme-bg-color);
         }
         
         /* QR-код */
@@ -80,15 +86,15 @@
             </div>
             
             <div class="border-t border-gray-100 pt-4 space-y-3">
-                <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50/50">
+                <div class="flex justify-between items-center p-3 rounded-xl stat-item">
                     <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Баланс:</span>
                     <span class="font-bold text-xl text-green-600" id="user-balance">0$</span>
                 </div>
-                <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50/50">
+                <div class="flex justify-between items-center p-3 rounded-xl stat-item">
                     <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Уровень:</span>
                     <span class="font-bold text-lg" style="color: var(--tg-theme-text-color)" id="user-lvl">0</span>
                 </div>
-                <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50/50">
+                <div class="flex justify-between items-center p-3 rounded-xl stat-item">
                     <span class="font-medium opacity-80" style="color: var(--tg-theme-text-color)">Скидка:</span>
                     <span class="font-bold text-lg text-blue-500" id="user-discount">0%</span>
                 </div>
@@ -117,7 +123,7 @@
                     <span id="selected-tariff">Выберите...</span>
                     <span>▼</span>
                 </button>
-                <div id="accordion" class="accordion-content space-y-2 rounded-xl p-2" style="background-color: var(--tg-theme-bg-color)">
+                <div id="accordion" class="accordion-content space-y-2 rounded-xl p-2">
                     <button onclick="selectTariff('7', '7 дней - 0.5$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">7 дней - 0.5$</button>
                     <button onclick="selectTariff('30', '1 месяц - 1.5$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">1 месяц - 1.5$</button>
                     <button onclick="selectTariff('90', '3 месяца - 4$')" class="w-full text-left p-3 rounded-lg" style="color: var(--tg-theme-text-color)">3 месяца - 4$</button>
