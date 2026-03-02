@@ -40,9 +40,18 @@
                     <p class="text-xs opacity-70">ID: <span id="user-id">000000</span></p>
                 </div>
             </div>
+            
             <div class="border-t border-gray-200 pt-3 flex justify-between">
                 <span>Баланс:</span>
                 <span class="font-bold text-lg text-green-500" id="user-balance">0$</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Уровень:</span>
+                <span class="font-bold" id="user-lvl">0</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Скидка:</span>
+                <span class="font-bold" id="user-discount">0%</span>
             </div>
         </div>
     </div>
@@ -96,8 +105,17 @@
             }
         }
 
-        // Заглушка данных
-        document.getElementById('user-balance').innerText = "0$";
+        // --- ЛОГИКА ДАННЫХ ---
+        // В реальном приложении тут должен быть fetch данных с сервера
+        const balance = 0; 
+        document.getElementById('user-balance').innerText = balance + "$";
+        
+        // Пересчет уровня и скидки
+        const level = Math.floor(balance / 5); 
+        const discount = level * 1; 
+        document.getElementById('user-lvl').innerText = level;
+        document.getElementById('user-discount').innerText = discount + "%";
+
         document.getElementById('sub-date').innerText = "20.03.2026";
         const vlessLink = "vless://example@77.91.84.106:443?type=grpc&serviceName=grpc#WyerVPN";
         document.getElementById('vless-link').value = vlessLink;
@@ -123,12 +141,9 @@
             tg.showAlert("Ссылка скопирована!");
         }
 
-        // --- ФУНКЦИЯ ПОКУПКИ С ЗАКРЫТИЕМ ---
         function buySubscription() {
             const days = document.getElementById("tariff-select").value;
             tg.sendData(JSON.stringify({action: "buy_sub", user_id: user.id, days: days}));
-            
-            // ЗАКРЫВАЕМ ОКНО
             tg.close();
         }
     </script>
