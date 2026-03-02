@@ -10,42 +10,56 @@
         body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); text-align: center; padding: 20px; }
         #qrcode { margin: 20px auto; display: flex; justify-content: center; }
         .key-text { word-break: break-all; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; font-size: 12px; margin-top: 10px; }
-        .status-active { color: green; font-weight: bold; }
-        .status-expired { color: red; font-weight: bold; }
+        .status-active { color: #51c470; font-weight: bold; }
+        .status-expired { color: #f26456; font-weight: bold; }
+        .loader { font-style: italic; color: gray; }
     </style>
 </head>
 <body>
     <h1>💎 Моя подписка</h1>
-    <p>Статус: <span id="status">Загрузка...</span></p>
-    <p>Действует до: <span id="expires">...</span></p>
     
-    <div id="qrcode"></div>
-    <div class="key-text" id="key">Загрузка ключа...</div>
+    <div id="data-container">
+        <p>Статус: <span id="status" class="loader">Загрузка...</span></p>
+        <p>Действует до: <span id="expires" class="loader">...</span></p>
+        
+        <canvas id="qrcode"></canvas>
+        <div class="key-text" id="key">Загрузка ключа...</div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. Получаем ID пользователя из URL
+        // 1. Получаем ID пользователя из URL, переданного ботом
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('uid');
 
-        // 2. !!! ЗАГЛУШКА !!!
-        // В реальной жизни тут нужен fetch('/api/user_info?id=' + userId)
-        // Но пока что мы просто показываем, что QR генерируется тут.
-        const vlessLink = "vless://ВАШ-UUID-ИЗ-БАЗЫ@77.91.84.106:443?security=reality&sni=www.apple.com&fp=chrome&type=tcp&flow=xtls-rprx-vision&pbk=yrhww5KokWmb-NHQoyV6G44OfBly5Q2BVxw5ZJ3CqD4&sid=a7#WyerVPN";
-        const subExpires = "31.12.2025";
-        const isActive = true;
+        // URL вашего бэкенда, который возвращает данные пользователя
+        const API_URL = 'https://ВАШ-API-URL.vercel.app/api/user-data?id=' + userId;
 
-        // 3. Отображение данных
-        document.getElementById('key').innerText = vlessLink;
-        document.getElementById('status').innerText = isActive ? "Активна" : "Истекла";
-        document.getElementById('status').className = isActive ? "status-active" : "status-expired";
-        document.getElementById('expires').innerText = subExpires;
+        if (userId) {
+            // 2. Запрос реальных данных
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    // Отображение данных из базы
+                    document.getElementById('key').innerText = data.vlessLink;
+                    document.getElementById('status').innerText = data.isActive ? "Активна" : "Истекла";
+                    document.getElementById('status').className = data.isActive ? "status-active" : "status-expired";
+                    document.getElementById('expires').innerText = data.subExpires;
+                    document.getElementById('status').classList.remove('loader');
+                    document.getElementById('expires').classList.remove('loader');
 
-        // 4. Генерация QR-кода прямо в браузере телефона
-        QRCode.toCanvas(document.getElementById('qrcode'), vlessLink, { width: 200, margin: 1 });
-        
+                    // 3. Генерация QR-кода
+                    QRCode.toCanvas(document.getElementById('qrcode'), data.vlessLink, { width: 200, margin: 1 });
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    document.getElementById('status').innerText = "Ошибка загрузки";
+                });
+        } else {
+            document.getElementById('status').innerText = "Ошибка: ID не найден";
+        }
     </script>
 </body>
 </html>
