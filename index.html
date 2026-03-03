@@ -7,128 +7,217 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: var(--tg-theme-bg-color, #ffffff);
-            --text: var(--tg-theme-text-color, #222222);
-            --hint: var(--tg-theme-hint-color, #999999);
-            --btn: var(--tg-theme-button-color, #248bed);
-            --btn-text: var(--tg-theme-button-text-color, #ffffff);
-            --sec-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            --bg-color: var(--tg-theme-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #222222);
+            --hint-color: var(--tg-theme-hint-color, #999999);
+            --button-color: var(--tg-theme-button-color, #248bed);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
         }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 0; }
-        .container { padding: 16px; padding-bottom: 80px; }
-        .card { background: var(--sec-bg); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Чтобы не было лишней прокрутки */
+        }
+
+        .container {
+            padding: 16px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        /* Карточки */
+        .card {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .label { font-size: 12px; color: var(--hint-color); text-transform: uppercase; margin-bottom: 4px; }
+        .value { font-size: 18px; font-weight: 700; }
+        .status-active { color: #34c759; }
+
+        /* Поле с ключом / ссылкой */
+        .copy-box {
+            background-color: var(--bg-color);
+            border: 1px solid var(--hint-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+
+        /* Кнопки */
+        .btn {
+            width: 100%;
+            background-color: var(--button-color);
+            color: var(--button-text);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        /* Навигация (Табы) */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background-color: var(--secondary-bg);
+            display: flex;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--hint-color);
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--button-color);
+        }
+
+        /* Скрытие контента */
         .tab-content { display: none; }
-        .active-tab { display: block; }
+        .tab-content.active { display: block; }
 
-        /* Навигация снизу */
-        .nav { position: fixed; bottom: 0; width: 100%; background: var(--sec-bg); display: flex; border-top: 1px solid var(--hint); }
-        .nav-item { flex: 1; text-align: center; padding: 12px 0; font-size: 12px; color: var(--hint); cursor: pointer; }
-        .nav-item.active { color: var(--btn); font-weight: bold; }
-
-        .label { font-size: 12px; color: var(--hint); text-transform: uppercase; }
-        .value { font-size: 18px; font-weight: bold; margin-top: 4px; }
-        .key-box { background: var(--bg); border: 1px solid var(--hint); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 11px; word-break: break-all; margin: 10px 0; }
-        
-        .btn { width: 100%; padding: 12px; background: var(--btn); color: var(--btn-text); border: none; border-radius: 10px; font-weight: bold; margin-bottom: 5px; }
-        .status-ok { color: #34c759; }
-        
-        ol { padding-left: 20px; font-size: 14px; line-height: 1.5; }
+        /* Инструкции */
+        .step { margin-bottom: 10px; font-size: 14px; line-height: 1.4; }
+        b { color: var(--button-color); }
     </style>
 </head>
 <body>
+
     <div class="container">
         
-        <div id="tab-profile" class="tab-content active-tab">
+        <div id="tab-profile" class="tab-content active">
             <div class="card">
                 <div class="label">Пользователь</div>
-                <div class="value" id="userName">...</div>
+                <div class="value" id="userName">Загрузка...</div>
             </div>
             <div class="card">
                 <div class="label">Статус подписки</div>
-                <div class="value status-ok" id="expiry">Загрузка...</div>
+                <div class="value status-active" id="expiry">Загрузка...</div>
             </div>
             <div class="card">
-                <div class="label">🔑 Твой ключ</div>
-                <div class="key-box" id="vKey">...</div>
-                <button class="btn" onclick="copyKey()">Копировать ключ</button>
+                <div class="label">Твой VLESS Ключ</div>
+                <div class="copy-box" id="vKey">...</div>
+                <button class="btn" onclick="copyText('vKey')">Копировать ключ</button>
             </div>
         </div>
 
-        <div id="tab-ref" class="tab-content">
+        <div id="tab-wallet" class="tab-content">
             <div class="card" style="text-align: center;">
-                <div class="label">Доступный баланс</div>
+                <div class="label">Текущий баланс</div>
                 <div class="value" style="font-size: 32px;" id="balance">0.00$</div>
-                <p style="font-size: 12px; color: var(--hint);">Деньги списываются при покупке тарифа автоматически</p>
             </div>
             <div class="card">
-                <div class="label">Заработано с друзей (30%)</div>
+                <div class="label">Всего заработано на рефералах</div>
                 <div class="value" id="earned">0.00$</div>
             </div>
             <div class="card">
-                <div class="label">Твоя ссылка для приглашения</div>
-                <div class="key-box" id="refLink">...</div>
-                <button class="btn" onclick="copyRef()">Пригласить друга</button>
+                <div class="label">Твоя реферальная ссылка (30% доход)</div>
+                <div class="copy-box" id="refLink">https://t.me/...</div>
+                <button class="btn" onclick="copyText('refLink')">Копировать ссылку</button>
             </div>
         </div>
 
         <div id="tab-help" class="tab-content">
             <div class="card">
-                <h3>Как подключить?</h3>
-                <ol>
-                    <li>Скачайте приложение <b>v2rayTun</b> (Android) или <b>V2Box</b> (iOS).</li>
-                    <li>Скопируйте ваш ключ из вкладки "Профиль".</li>
-                    <li>В приложении нажмите <b>"+"</b> или <b>"Add"</b>.</li>
-                    <li>Выберите <b>"Import from Clipboard"</b>.</li>
-                    <li>Нажмите на появившийся профиль и кнопку подключения.</li>
-                </ol>
+                <h3 style="margin-top:0">Инструкция</h3>
+                <div class="step">1. Установите <b>v2rayNG</b> (Android) или <b>V2Box</b> (iOS).</div>
+                <div class="step">2. Скопируйте ключ из вкладки <b>Профиль</b>.</div>
+                <div class="step">3. В приложении нажмите <b>"+"</b> -> <b>"Import from Clipboard"</b>.</div>
+                <div class="step">4. Выберите сервер и нажмите кнопку подключения.</div>
+            </div>
+            <div class="card">
+                <div class="label">Поддержка</div>
+                <div class="value">@WyerSupport</div>
             </div>
         </div>
 
     </div>
 
-    <div class="nav">
-        <div class="nav-item active" onclick="showTab('profile', this)">Профиль</div>
-        <div class="nav-item" onclick="showTab('ref', this)">Кошелек</div>
-        <div class="nav-item" onclick="showTab('help', this)">Помощь</div>
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchTab('profile', this)">
+            <span>👤 Профиль</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('wallet', this)">
+            <span>💰 Кошелек</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('help', this)">
+            <span>❓ Помощь</span>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
+        const SERVER_IP = "79.132.140.45"; // ЗАМЕНИ НА СВОЙ IP
+        
         tg.expand();
+        tg.ready();
+
         const userId = tg.initDataUnsafe.user.id;
         document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
-        document.getElementById('refLink').innerText = "https://t.me/WyerVPN_bot?start=" + userId;
+        document.getElementById('refLink').innerText = `https://t.me/WyerVPN_bot?start=${userId}`;
 
-        function showTab(tabId, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active-tab');
+        // Функция переключения вкладок
+        function switchTab(tabName, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
             el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        async function loadData() {
+        // Загрузка данных с сервера
+        async function loadProfileData() {
             try {
-                // ОБЯЗАТЕЛЬНО: Укажи здесь IP своего сервера
-                const res = await fetch(`http://79.132.140.45:8000/api/profile/${userId}`);
-                const data = await res.json();
-                document.getElementById('balance').innerText = data.balance.toFixed(2) + "$";
-                document.getElementById('earned').innerText = data.earned.toFixed(2) + "$";
-                document.getElementById('vKey').innerText = data.key;
-                document.getElementById('expiry').innerText = "До: " + data.expiry;
-            } catch (e) { console.error(e); }
+                const response = await fetch(`http://${SERVER_IP}:8000/api/profile/${userId}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById('vKey').innerText = "Ключ появится после покупки";
+                    document.getElementById('expiry').innerText = "Нет активной подписки";
+                } else {
+                    document.getElementById('balance').innerText = data.balance.toFixed(2) + "$";
+                    document.getElementById('earned').innerText = data.earned.toFixed(2) + "$";
+                    document.getElementById('vKey').innerText = data.key;
+                    document.getElementById('expiry').innerText = "Активен до: " + data.expiry;
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('expiry').innerText = "Ошибка связи с сервером";
+            }
         }
 
-        function copyKey() {
-            navigator.clipboard.writeText(document.getElementById('vKey').innerText);
-            tg.showAlert("Ключ скопирован!");
+        // Копирование
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            tg.showAlert("Скопировано!");
         }
 
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
-            tg.showAlert("Реферальная ссылка скопирована!");
-        }
-
-        loadData();
+        loadProfileData();
     </script>
 </body>
 </html>
