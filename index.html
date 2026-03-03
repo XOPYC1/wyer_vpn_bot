@@ -2,100 +2,133 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyer VPN Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wyer VPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--tg-theme-bg-color, #ffffff); color: var(--tg-theme-text-color, #000000); margin: 0; padding: 20px; }
-        .container { max-width: 400px; margin: 0 auto; }
-        .card { background-color: var(--tg-theme-secondary-bg-color, #f4f4f5); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        h3 { margin-top: 0; color: var(--tg-theme-hint-color, #999999); font-size: 14px; }
-        p { margin: 5px 0; font-size: 16px; font-weight: bold; }
-        .key-box { background-color: #e0e0e0; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; margin-top: 10px; }
-        .ref-box { background-color: var(--tg-theme-button-color, #3390ec); color: var(--tg-theme-button-text-color, #ffffff); padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; }
-        .instruction { display: none; margin-top: 10px; font-size: 13px; color: var(--tg-theme-text-color); }
-        button { background-color: var(--tg-theme-button-color, #3390ec); color: var(--tg-theme-button-text-color, #ffffff); border: none; padding: 10px; border-radius: 8px; width: 100%; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        :root {
+            --bg: var(--tg-theme-bg-color, #ffffff);
+            --text: var(--tg-theme-text-color, #222222);
+            --hint: var(--tg-theme-hint-color, #999999);
+            --btn: var(--tg-theme-button-color, #248bed);
+            --btn-text: var(--tg-theme-button-text-color, #ffffff);
+            --sec-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
+        }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 0; }
+        .container { padding: 16px; padding-bottom: 80px; }
+        .card { background: var(--sec-bg); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .tab-content { display: none; }
+        .active-tab { display: block; }
+
+        /* Навигация снизу */
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--sec-bg); display: flex; border-top: 1px solid var(--hint); }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; font-size: 12px; color: var(--hint); cursor: pointer; }
+        .nav-item.active { color: var(--btn); font-weight: bold; }
+
+        .label { font-size: 12px; color: var(--hint); text-transform: uppercase; }
+        .value { font-size: 18px; font-weight: bold; margin-top: 4px; }
+        .key-box { background: var(--bg); border: 1px solid var(--hint); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 11px; word-break: break-all; margin: 10px 0; }
+        
+        .btn { width: 100%; padding: 12px; background: var(--btn); color: var(--btn-text); border: none; border-radius: 10px; font-weight: bold; margin-bottom: 5px; }
+        .status-ok { color: #34c759; }
+        
+        ol { padding-left: 20px; font-size: 14px; line-height: 1.5; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Личный кабинет</h2>
-
-        <div class="card">
-            <h3>🆔 ID</h3>
-            <p id="user-id">Загрузка...</p>
-        </div>
-
-        <div class="card">
-            <h3>👤 Никнейм (можно менять в боте)</h3>
-            <p id="user-nickname">Загрузка...</p>
-        </div>
-
-        <div class="card">
-            <h3>📊 Username</h3>
-            <p id="user-username">Загрузка...</p>
-        </div>
-
-        <div class="card">
-            <h3>⏱ Статус подписки</h3>
-            <p id="sub-status">Проверка...</p>
-        </div>
-
-        <div class="card">
-            <h3>🔑 Ваш Vless Ключ</h3>
-            <div id="vless-key" class="key-box">Загрузка...</div>
-            <button onclick="copyKey()">Копировать ключ</button>
-        </div>
-
-        <div class="card">
-            <h3>🔗 Реферальная ссылка</h3>
-            <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Приглашайте друзей и получайте 30% от их покупок!</p>
-            <div id="ref-link" class="ref-box">Загрузка...</div>
-        </div>
-
-        <div class="card">
-            <h3>📖 Инструкция</h3>
-            <button onclick="toggleInstruction()">Показать/Скрыть инструкцию</button>
-            <div id="instruction-text" class="instruction">
-                <strong>iOS (Shadowrocket):</strong> 1. Скопируйте ключ. 2. Откройте Shadowrocket, он автоматически предложит добавить сервер.
-                <br><br>
-                <strong>Android (v2rayNG):</strong> 1. Скопируйте ключ. 2. Откройте v2rayNG, нажмите "+" -> "Импортировать конфиг из буфера обмена".
-                <br><br>
-                <strong>Windows (Nekoray):</strong> 1. Скопируйте ключ. 2. Откройте Nekoray, нажмите "Настройки" -> "Добавить профиль из буфера обмена".
+        
+        <div id="tab-profile" class="tab-content active-tab">
+            <div class="card">
+                <div class="label">Пользователь</div>
+                <div class="value" id="userName">...</div>
+            </div>
+            <div class="card">
+                <div class="label">Статус подписки</div>
+                <div class="value status-ok" id="expiry">Загрузка...</div>
+            </div>
+            <div class="card">
+                <div class="label">🔑 Твой ключ</div>
+                <div class="key-box" id="vKey">...</div>
+                <button class="btn" onclick="copyKey()">Копировать ключ</button>
             </div>
         </div>
+
+        <div id="tab-ref" class="tab-content">
+            <div class="card" style="text-align: center;">
+                <div class="label">Доступный баланс</div>
+                <div class="value" style="font-size: 32px;" id="balance">0.00$</div>
+                <p style="font-size: 12px; color: var(--hint);">Деньги списываются при покупке тарифа автоматически</p>
+            </div>
+            <div class="card">
+                <div class="label">Заработано с друзей (30%)</div>
+                <div class="value" id="earned">0.00$</div>
+            </div>
+            <div class="card">
+                <div class="label">Твоя ссылка для приглашения</div>
+                <div class="key-box" id="refLink">...</div>
+                <button class="btn" onclick="copyRef()">Пригласить друга</button>
+            </div>
+        </div>
+
+        <div id="tab-help" class="tab-content">
+            <div class="card">
+                <h3>Как подключить?</h3>
+                <ol>
+                    <li>Скачайте приложение <b>v2rayTun</b> (Android) или <b>V2Box</b> (iOS).</li>
+                    <li>Скопируйте ваш ключ из вкладки "Профиль".</li>
+                    <li>В приложении нажмите <b>"+"</b> или <b>"Add"</b>.</li>
+                    <li>Выберите <b>"Import from Clipboard"</b>.</li>
+                    <li>Нажмите на появившийся профиль и кнопку подключения.</li>
+                </ol>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="showTab('profile', this)">Профиль</div>
+        <div class="nav-item" onclick="showTab('ref', this)">Кошелек</div>
+        <div class="nav-item" onclick="showTab('help', this)">Помощь</div>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.ready();
         tg.expand();
+        const userId = tg.initDataUnsafe.user.id;
+        document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
+        document.getElementById('refLink').innerText = "https://t.me/WyerVPN_bot?start=" + userId;
 
-        // Данные из Telegram
-        document.getElementById('user-id').innerText = tg.initDataUnsafe.user.id;
-        document.getElementById('user-username').innerText = '@' + tg.initDataUnsafe.user.username;
+        function showTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active-tab');
+            el.classList.add('active');
+        }
 
-        // --- ВАЖНО ---
-        // Чтобы получить nickname, sub_status и vless_key, 
-        // нужно отправлять запрос к твоему боту (main.py), 
-        // который будет брать данные из SQLite.
-        // Сейчас поставим заглушки.
-        document.getElementById('user-nickname').innerText = tg.initDataUnsafe.user.first_name;
-        document.getElementById('sub-status').innerText = 'Активна';
-        document.getElementById('vless-key').innerText = 'vless://...ваш_ключ...';
-        document.getElementById('ref-link').innerText = 'https://t.me/WyerVPN_bot?start=' + tg.initDataUnsafe.user.id;
+        async function loadData() {
+            try {
+                // ОБЯЗАТЕЛЬНО: Укажи здесь IP своего сервера
+                const res = await fetch(`http://79.132.140.45:8000/api/profile/${userId}`);
+                const data = await res.json();
+                document.getElementById('balance').innerText = data.balance.toFixed(2) + "$";
+                document.getElementById('earned').innerText = data.earned.toFixed(2) + "$";
+                document.getElementById('vKey').innerText = data.key;
+                document.getElementById('expiry').innerText = "До: " + data.expiry;
+            } catch (e) { console.error(e); }
+        }
 
         function copyKey() {
-            const key = document.getElementById('vless-key').innerText;
-            navigator.clipboard.writeText(key);
-            tg.showAlert('Ключ скопирован!');
+            navigator.clipboard.writeText(document.getElementById('vKey').innerText);
+            tg.showAlert("Ключ скопирован!");
         }
 
-        function toggleInstruction() {
-            const el = document.getElementById('instruction-text');
-            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+        function copyRef() {
+            navigator.clipboard.writeText(document.getElementById('refLink').innerText);
+            tg.showAlert("Реферальная ссылка скопирована!");
         }
+
+        loadData();
     </script>
 </body>
 </html>
